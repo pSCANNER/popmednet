@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B5A7864F-AA68-4022-9E85-766CAFD3A4D5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>pSCANNER.DataMart.Model.processor</RootNamespace>
+    <AssemblyName>pSCANNER.DataMart.Model.processor</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="LinqKit, Version=1.1.9.0, Culture=neutral, PublicKeyToken=bc217f8844052a91, processorArchitecture=MSIL">
+      <HintPath>..\packages\LinqKit.1.1.9.0\lib\net45\LinqKit.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Lpp.QueryComposer">
+      <HintPath>..\Dependencies\Lpp.QueryComposer.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Npgsql, Version=3.2.5.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Npgsql.3.2.5\lib\net451\Npgsql.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.4.0\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Aggregation\Coefficients.cs" />
+    <Compile Include="Aggregation\PScannerAggregatorProxy.cs" />
+    <Compile Include="Aggregation\RScriptWriter.cs" />
+    <Compile Include="Aggregation\ScannerAnalysisModelAggregator.cs" />
+    <Compile Include="Aggregation\ScriptConstants.cs" />
+    <Compile Include="Aggregation\SiteResponse.cs" />
+    <Compile Include="Aggregation\VariableEntry.cs" />
+    <Compile Include="Analysis\LocalConstants.cs" />
+    <Compile Include="Analysis\MiningFields.cs" />
+    <Compile Include="Analysis\ProcessorResponse.cs" />
+    <Compile Include="Analysis\PScannerProcessorProxy.cs" />
+    <Compile Include="Analysis\RequestParameterList.cs" />
+    <Compile Include="Analysis\RScriptWriter.cs" />
+    <Compile Include="Analysis\ScannerAnalysisModelProcessor.cs" />
+    <Compile Include="Common\Base\BaseAdapterRequestParameter.cs" />
+    <Compile Include="Common\Base\BaseProxyRequestParameter.cs" />
+    <Compile Include="Common\Base\BaseRequestParameter.cs" />
+    <Compile Include="Common\Base\BaseScriptBuilder.cs" />
+    <Compile Include="Common\Base\BaseScriptParser.cs" />
+    <Compile Include="Common\Base\CellBase.cs" />
+    <Compile Include="Common\Base\MetaDataBase.cs" />
+    <Compile Include="Common\Base\PmmlBase.cs" />
+    <Compile Include="Common\Base\ProxyBase.cs" />
+    <Compile Include="Common\Base\ResponseBase.cs" />
+    <Compile Include="Common\Base\ScannerBase.cs" />
+    <Compile Include="Common\Base\VariableConstants.cs" />
+    <Compile Include="Common\Exceptions\UnexpectedSwitchValue.cs" />
+    <Compile Include="Common\ExtMethods\StringsExt.cs" />
+    <Compile Include="Common\Models\Constants.cs" />
+    <Compile Include="Common\Models\ConvergenceWarningModel.cs" />
+    <Compile Include="Common\Models\CovarianceModel.cs" />
+    <Compile Include="Common\Models\CovModelEntry.cs" />
+    <Compile Include="Common\Models\DataDictionary.cs" />
+    <Compile Include="Common\Models\DataField.cs" />
+    <Compile Include="Common\Models\EntryList.cs" />
+    <Compile Include="Common\Models\ErrorAndCovarianceModel.cs" />
+    <Compile Include="Common\Models\ErrorGradientModel.cs" />
+    <Compile Include="Common\Models\Helper.cs" />
+    <Compile Include="Common\Models\IModelBase.cs" />
+    <Compile Include="Common\Models\ParamMatrix.cs" />
+    <Compile Include="Common\Models\PPMatrix.cs" />
+    <Compile Include="Common\Models\PreviousIteration.cs" />
+    <Compile Include="Common\Models\TempFile.cs" />
+    <Compile Include="Common\Parameters\AggregatorClientRequestParameter.cs" />
+    <Compile Include="Common\Parameters\AggregatorResponse.cs" />
+    <Compile Include="Common\Parameters\AggregatorServerRequestParameter.cs" />
+    <Compile Include="Common\Parameters\DanRequestParameter.cs" />
+    <Compile Include="Common\Parameters\IRExecution.cs" />
+    <Compile Include="Common\Parameters\IUserJsonInputParameter.cs" />
+    <Compile Include="Common\Parameters\Request\RRequestParameter.cs" />
+    <Compile Include="Common\Parameters\Response\MockResponse.cs" />
+    <Compile Include="Common\Parameters\Response\RResponse.cs" />
+    <Compile Include="Common\Parameters\Response\StatusResponse.cs" />
+    <Compile Include="Common\Parameters\Response\WebResponse.cs" />
+    <Compile Include="Common\Parameters\WebServiceRequestParameter.cs" />
+    <Compile Include="Common\Pmml\DataDictionaryEntry.cs" />
+    <Compile Include="Common\Pmml\Extension.cs" />
+    <Compile Include="Common\Pmml\MiningSchema.cs" />
+    <Compile Include="Common\Pmml\PCovCell.cs" />
+    <Compile Include="Common\Pmml\PCovMatrix.cs" />
+    <Compile Include="Common\Pmml\PmmlDocument.cs" />
+    <Compile Include="Common\Pmml\PmmlElement.cs" />
+    <Compile Include="Common\Pmml\PmmlParser.cs" />
+    <Compile Include="Common\Pmml\PmmlScriptBuilder.cs" />
+    <Compile Include="Common\Pmml\RequestParameterList.cs" />
+    <Compile Include="Common\Processor\Adapers\Base\BaseAdapter.cs" />
+    <Compile Include="Common\Processor\Adapers\Base\RAdapterBase.cs" />
+    <Compile Include="Common\Processor\Adapers\Base\WebAdapterBase.cs" />
+    <Compile Include="Common\Processor\Adapers\Mock\MockAdapter.cs" />
+    <Compile Include="Common\Processor\Adapers\Mock\MockRAdapter.cs" />
+    <Compile Include="Common\Processor\Adapers\Mock\MockWebAdapter.cs" />
+    <Compile Include="Common\Processor\Adapers\WebAdapter.cs" />
+    <Compile Include="Common\Processor\Task\AsyncTask.cs" />
+    <Compile Include="Common\Processor\Task\NullTask.cs" />
+    <Compile Include="Common\Processor\Task\SyncTask.cs" />
+    <Compile Include="Common\Processor\Task\TaskBase.cs" />
+    <Compile Include="Common\R\RAdapter.cs" />
+    <Compile Include="Common\R\RResultParser.cs" />
+    <Compile Include="Common\R\RScriptBuilder.cs" />
+    <Compile Include="DataSetMapping\AppConfigRegistry.cs" />
+    <Compile Include="DataSetMapping\BaseDataSetConnection.cs" />
+    <Compile Include="DataSetMapping\Configuration\DataSetConnection.cs" />
+    <Compile Include="DataSetMapping\Configuration\DataSetConnectionCollection.cs" />
+    <Compile Include="DataSetMapping\Configuration\DataSetConnectionElement.cs" />
+    <Compile Include="DataSetMapping\Configuration\DataSetConnectionSection.cs" />
+    <Compile Include="DataSetMapping\DatabaseDataSetConnection.cs" />
+    <Compile Include="DataSetMapping\EmptyConnection.cs" />
+    <Compile Include="DataSetMapping\HttpDataSetConnection.cs" />
+    <Compile Include="DataSetMapping\IRegistry.cs" />
+    <Compile Include="DataSetMapping\MockRegistry.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScannerAnalysisModelTermProvider.cs" />
+    <Compile Include="Study\ScannerStudyModelProcessor.cs" />
+    <Compile Include="Study\ScannerStudyModelTermProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Analysis\expressoProject\status.xso" />
+    <None Include="App.config" />
+    <None Include="Common\Pmml\PMML.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Misc\hosts" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lpp.Adapters\Lpp.Dns.DataMart.Model.Interface\Lpp.Dns.DataMart.Model.Interfaces.csproj">
+      <Project>{325d9b27-88f8-49d3-a347-40a22881624c}</Project>
+      <Name>Lpp.Dns.DataMart.Model.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lpp.Adapters\Lpp.Dns.DataMart.Model.Processors\Lpp.Dns.DataMart.Model.Processors.csproj">
+      <Project>{0b77934b-b8b5-4d33-aba0-3b799c20baf0}</Project>
+      <Name>Lpp.Dns.DataMart.Model.Processors</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lpp.Adapters\Lpp.Dns.DataMart.Model.QueryComposer\Lpp.Dns.DataMart.Model.QueryComposer.csproj">
+      <Project>{b22805c6-4152-400a-9567-c8f5e39fa400}</Project>
+      <Name>Lpp.Dns.DataMart.Model.QueryComposer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lpp.Dns.DTO.Scanner\Lpp.Dns.DTO.Scanner.csproj">
+      <Project>{e46b9b37-5144-4eb6-bfc1-85cdfccbb6e1}</Project>
+      <Name>Lpp.Dns.DTO.Scanner</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lpp.Dns.DTO\Lpp.Dns.DTO.csproj">
+      <Project>{dd487aa9-8099-4aa7-8cb2-bae3a2b5104d}</Project>
+      <Name>Lpp.Dns.DTO</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\MSBuild.Extension.Pack.1.9.0\build\net40\MSBuild.Extension.Pack.targets" Condition="Exists('..\packages\MSBuild.Extension.Pack.1.9.0\build\net40\MSBuild.Extension.Pack.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\MSBuild.Extension.Pack.1.9.0\build\net40\MSBuild.Extension.Pack.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSBuild.Extension.Pack.1.9.0\build\net40\MSBuild.Extension.Pack.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

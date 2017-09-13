@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Lpp.Dns.DTO
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class TaskOrderImportDTO
     {
         public string ID { get; set; }
@@ -13,6 +16,9 @@ namespace Lpp.Dns.DTO
         public ICollection<ActivityImportDTO> Activities { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ActivityImportDTO
     {
         [JsonProperty("activity_id")]
@@ -25,6 +31,9 @@ namespace Lpp.Dns.DTO
         public ICollection<SubActivityImportDTO> Activities { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class SubActivityImportDTO
     {
         [JsonProperty("subactivity_id")]
