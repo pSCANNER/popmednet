@@ -1,53 +1,52 @@
 #region Legal Information
 
 // ====================================================================================
-//  
-//      Center for Population Health Informatics
-//      Solution: Lpp.Adapters
-//      Project: Lpp.Scanner.DataMart.Model.Processors
-//      Last Updated By: Westerman, Dax Marek
-// 
+//
+// Center for Population Health Informatics
+// Solution: Lpp.Adapters
+// Project: Lpp.Scanner.DataMart.Model.Processors Last Updated By: Westerman, Dax Marek
+//
 // ====================================================================================
 
-#endregion
+#endregion Legal Information
 
 #region Using
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using LinqKit;
 using Lpp.Dns.DataMart.Model;
 using Lpp.Dns.DataMart.Model.Settings;
+using Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Base;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Models;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Parameters;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Processor.Task;
 using Newtonsoft.Json;
+using pSCANNER.DataMart.Model.processor.Common.Base;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 
-
-#endregion
+#endregion Using
 
 namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
 
     [Serializable]
     public class ScannerAnalysisModelAggregator : ScannerBase {
+
         #region Setup
 
         #region Constructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="ScannerAnalysisModelAggregator" /> class.
+        ///     Initializes a new instance of the <see cref="ScannerAnalysisModelAggregator"/> class.
         /// </summary>
-        public ScannerAnalysisModelAggregator() : this(new PScannerAggregatorProxy<AsyncTask>(), new ScannerAggregationModelMetadata()) {}
+        public ScannerAnalysisModelAggregator() : this(new PScannerAggregatorProxy<AsyncTask>(), new ScannerAggregationModelMetadata()) { }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="ScannerAnalysisModelAggregator" /> class.
+        ///     Initializes a new instance of the <see cref="ScannerAnalysisModelAggregator"/> class.
         /// </summary>
         /// <param name="proxy">The proxy.</param>
         /// <param name="metaDataModel">The meta data model.</param>
@@ -55,26 +54,17 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
             PmmlInputDocs = new List<string>();
         }
 
-        #endregion
+        #endregion Constructors
 
         #region Properties
 
         /// <summary>
         ///     Gets the PMML input docs.
         /// </summary>
-        /// <value>
-        ///     The PMML input docs.
-        /// </value>
+        /// <value>The PMML input docs.</value>
         private IList<string> PmmlInputDocs { get; set; }
 
-        #endregion
-
-        /// <summary>
-        ///     Requests this instance.
-        /// </summary>
-        protected override void request() {
-            PmmlInputDocs = new List<string>();
-        }
+        #endregion Properties
 
         /// <summary>
         ///     Called repeatedly to provide the Model with the specified document contents.
@@ -83,20 +73,15 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         /// <param name="documentId">The id of the Document being transferred</param>
         /// <param name="contentStream">Stream pointer to read the document</param>
         public override void RequestDocument(string requestId, string documentId, Stream contentStream) {
-
             Log.Debug(string.Format("ScannerAggregationModelProcessor.RequestDocument(RequestId={0}, documentId={1}", requestId, documentId));
 
             try {
-
                 var doc = DesiredDocuments.First(x => x.DocumentID == documentId);
                 using (var reader = new StreamReader(contentStream)) {
-
                     if (doc.Filename.Contains("parameters.json")) {
                         var docText = reader.ReadToEnd();
                         ParametersJson = docText;
-
                     } else {
-
                         assignPmmlInputDocuments(reader);
                     }
                 }
@@ -109,6 +94,14 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         }
 
         /// <summary>
+        ///     Gets the size of the buffer.
+        /// </summary>
+        /// <returns></returns>
+        protected override int GetBufferSize() {
+            return 10000;
+        }
+
+        /// <summary>
         ///     Gets the processor identifier.
         /// </summary>
         /// <returns></returns>
@@ -117,25 +110,25 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         }
 
         /// <summary>
-        ///     Gets the size of the buffer.
+        ///     Requests this instance.
         /// </summary>
-        /// <returns></returns>
-        protected override int GetBufferSize() {
-            return 10000;
+        protected override void request() {
+            PmmlInputDocs = new List<string>();
         }
 
         #region ScannerAggregationModelMetadata
 
         [Serializable]
         internal class ScannerAggregationModelMetadata : MetaDataBase {
+
             #region Constructors
 
             /// <summary>
-            ///     Initializes a new instance of the <see cref="ScannerAggregationModelMetadata" /> class.
+            ///     Initializes a new instance of the <see cref="ScannerAggregationModelMetadata"/> class.
             /// </summary>
-            public ScannerAggregationModelMetadata() : base(new Dictionary<string, bool> {{"IsSingleton", true}, {"RequiresConfig", false}, {"AddFiles", true}, {"CanRunAndUpload", true}, {"CanUploadWithoutRun", true}}, new Dictionary<string, string> {{"ServiceURL", string.Empty}, {Constants.Aggregator.Input.SettingsEnum.rLocation.ToString(), string.Empty}}) {}
+            public ScannerAggregationModelMetadata() : base(new Dictionary<string, bool> { { "IsSingleton", true }, { "RequiresConfig", false }, { "AddFiles", true }, { "CanRunAndUpload", true }, { "CanUploadWithoutRun", true } }, new Dictionary<string, string> { { "ServiceURL", string.Empty }, { Constants.Aggregator.Input.SettingsEnum.rLocation.ToString(), string.Empty } }) { }
 
-            #endregion
+            #endregion Constructors
 
             #region Properties
 
@@ -162,7 +155,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
             /// </summary>
             public override ICollection<ProcessorSetting> Settings {
                 get {
-                    var settings = new List<ProcessorSetting> {new ProcessorSetting {Title = "R Location", Key = Constants.Aggregator.Input.SettingsEnum.rLocation.ToString(), DefaultValue = "C:\\Program Files\\R\\R-3.3.1\\bin\\x64", ValueType = typeof(string), Required = true}};
+                    var settings = new List<ProcessorSetting> { new ProcessorSetting { Title = "R Location", Key = Constants.Aggregator.Input.SettingsEnum.rLocation.ToString(), DefaultValue = "C:\\Program Files\\R\\R-3.3.1\\bin\\x64", ValueType = typeof(string), Required = true } };
                     return settings;
                 }
             }
@@ -176,39 +169,10 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
                 }
             }
 
-            #endregion
+            #endregion Properties
         }
 
-        #endregion
-
-        static readonly Regex _pmmlCapture = new Regex(@"<\?xml[\s\w="".-]+\?>.+?</PMML>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
-
-        /// <summary>
-        ///     Assigns the PMML input documents.
-        /// </summary>
-        /// <param name="reader">The reader.</param>
-        private void assignPmmlInputDocuments(TextReader reader) {
-
-            var docs = reader.ReadToEnd();
-
-            var matchCollection = _pmmlCapture.Matches(docs);
-
-            var enumerator = matchCollection.GetEnumerator();
-            while (enumerator.MoveNext()) {
-                var value = ((Match) enumerator.Current).Captures[0].Value;
-                PmmlInputDocs.Add(value);
-            }
-        }
-
-        /// <summary>
-        ///     Asses the response documents.
-        /// </summary>
-        /// <param name="requestParameter">The request parameter.</param>
-        private void addResponseDocuments(BaseRequestParameter requestParameter) {
-            var response = (AggregatorResponse) Proxy.GetResponse(requestParameter);
-
-            addDocument("0", "json", "Parameters", response.FinalResponse);
-        }
+        #endregion ScannerAggregationModelMetadata
 
         /// <summary>
         ///     Adds the document.
@@ -218,15 +182,42 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         /// <param name="responseType">Type of the response.</param>
         /// <param name="finalResponse">The final response.</param>
         private void addDocument(string documentId, string fileType, string responseType, string finalResponse) {
-
             var mimeType = string.Format("application/{0}", fileType);
             var filename = string.Format("{0}.{1}", responseType.ToLower(), fileType);
-            var document = new Document(documentId, mimeType, filename) {IsViewable = false, Size = finalResponse.Length};
+            var document = new Document(documentId, mimeType, filename) { IsViewable = false, Size = finalResponse.Length };
             ResponseJson = finalResponse;
             ResponseDocuments.Add(new InternalDocument(document, ResponseJsonPath, document.Size));
         }
 
-        #endregion
+        /// <summary>
+        ///     Asses the response documents.
+        /// </summary>
+        /// <param name="requestParameter">The request parameter.</param>
+        private void addResponseDocuments(BaseRequestParameter requestParameter) {
+            var response = (AggregatorResponse)Proxy.GetResponse(requestParameter);
+
+            addDocument("0", "json", "Parameters", response.FinalResponse);
+        }
+
+        /// <summary>
+        ///     Assigns the PMML input documents.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        private void assignPmmlInputDocuments(TextReader reader) {
+            var docs = reader.ReadToEnd();
+
+            var matchCollection = _pmmlCapture.Matches(docs);
+
+            var enumerator = matchCollection.GetEnumerator();
+            while (enumerator.MoveNext()) {
+                var value = ((Match)enumerator.Current).Captures[0].Value;
+                PmmlInputDocs.Add(value);
+            }
+        }
+
+        private static readonly Regex _pmmlCapture = new Regex(@"<\?xml[\s\w="".-]+\?>.+?</PMML>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+        #endregion Setup
 
         #region Model Processor Life Cycle Methods
 
@@ -246,111 +237,6 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         //  "PMML.Header.Extension.MaxIterations": "5"
         //}
 
-        
-
-        /// <summary>
-        /// Initializes the parameters.
-        /// </summary>
-        /// <param name="parametersJson">The parameters json.</param>
-        private void initializeParameters(ref string parametersJson) {
-            if (parametersJson.Contains("PMML.GeneralRegressionModel.Coefficients") == false) {
-
-                dynamic parametersObject = JsonConvert.DeserializeObject(parametersJson);
-
-                var target = parametersObject["PMML.GeneralRegressionModel.MiningSchema.MiningField.target"];
-                var interceptTag = string.Format("PMML.GeneralRegressionModel.Coefficients.{0}", VariableConstants.InterceptConst);
-                var targetTag = "PMML.GeneralRegressionModel.Coefficients." + target;
-
-                if (parametersObject[targetTag] == null) {
-
-                    parametersObject[interceptTag] = Constants.InitialCoefficient;
-                    parametersObject[targetTag] = Constants.InitialCoefficient;
-                    var active = parametersObject["PMML.GeneralRegressionModel.MiningSchema.MiningField.active"];
-                    int max = active.Count;
-                    var index = 0;
-
-                    while (index < max) {
-                        parametersObject["PMML.GeneralRegressionModel.Coefficients." + active[index]] = Constants.InitialCoefficient;
-                        index++;
-                    }
-
-                    parametersJson = JsonConvert.SerializeObject(parametersObject);
-                }
-            }
-
-        }
-
-        /// <summary>
-        ///     Starts the specified request identifier.
-        /// </summary>
-        /// <param name="requestId">The request identifier.</param>
-        /// <param name="viewSql">if set to <c>true</c> [view SQL].</param>
-        /// <exception cref="ModelProcessorError"></exception>
-        public override void Start(string requestId, bool viewSql = false) {
-
-            Log.Debug(string.Format("ScannerAnalysisModelAggregator.Start(RequestId={0}, viewSQL={1}{2}", requestId, viewSql, ')'));
-
-            try {
-
-                var rLocationPath = Settings.GetAsString(Constants.Aggregator.Input.SettingsEnum.rLocation.ToString(), "");
-
-                var pmmlInputDocs = PmmlInputDocs;
-                var parametersJson = ParametersJson;
-
-                initializeParameters(ref parametersJson);
-                var siteNames = DesiredDocuments.Select(x => x.Filename).Select(x => x.Split('.')[0]).ToArray();
-
-                var requestParameter = new AggregatorServerRequestParameter(requestId, rLocationPath, pmmlInputDocs, parametersJson, siteNames);
-
-                var responseBase = Proxy.PostRequest(requestParameter);
-
-                if (responseBase.Status != Constants.ResponseStatus.Error) {
-
-                    if (responseBase == null) {
-                        throw new ModelProcessorError("Error in response", new Exception("Error in response"));
-                    }
-
-                    RequestStatus.Code = RequestStatus.StatusCode.InProgress;
-
-                    while (responseBase.Status == Constants.ResponseStatus.InProgress || responseBase.Status == Constants.ResponseStatus.Undefined) {
-                        Thread.Sleep(1000);
-                        responseBase = Proxy.GetStatus(requestParameter);
-                    }
-
-                    // this should cycle through and load up the document information as well as actual response JSON
-                    if (responseBase.Status != Constants.ResponseStatus.InProgress) {
-
-                        ResponseJsonPath = string.Format("{0}{1}.json", Path.GetTempPath(), Guid.NewGuid());
-
-                        addResponseDocuments(requestParameter);
-
-                        // Set completion status
-                        RequestStatus.Code = RequestStatus.StatusCode.Complete;
-                        RequestStatus.Message = string.Empty;
-
-                    } else {
-                        // I need to figure out the best error response here
-                        throw new ModelProcessorError("Error in response", new Exception("Error in response"));
-                    }
-                } else {
-                    Status(requestId).Code = RequestStatus.StatusCode.Error;
-                }
-            } catch (Exception ex) {
-
-                Log.Debug(ex);
-
-                //while (Statuses(requestId).Code == RequestStatus.StatusCode.InProgress) {
-                //    Thread.Sleep(10000);
-                //}
-
-                if (Status(requestId).Code == RequestStatus.StatusCode.Error) {
-                    throw new ModelProcessorError(ex.Message, ex);
-                }
-            }
-        }
-
-        public string ResponseJsonPath { get; set; }
-
         /// <summary>
         ///     Gets input stream for the specified Document.
         /// </summary>
@@ -359,7 +245,6 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         /// <param name="contentStream">Stream pointer to a specified Document</param>
         /// <param name="maxSize">Maximum chunk size (returned chunk may be smaller)</param>
         public override void ResponseDocument(string requestId, string documentId, out Stream contentStream, int maxSize) {
-
             Log.Debug(string.Format("ScannerStudyModelProcessor:ResponseDocument: RequestId={0}, documentId={1}", requestId, documentId));
 
             contentStream = null;
@@ -375,10 +260,102 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
             if (idoc != null) {
                 contentStream = new FileStream(idoc.Path, FileMode.Open);
             }
-
         }
 
-        #endregion
-    }
+        /// <summary>
+        ///     Starts the specified request identifier.
+        /// </summary>
+        /// <param name="requestId">The request identifier.</param>
+        /// <param name="viewSql">if set to <c>true</c> [view SQL].</param>
+        /// <exception cref="ModelProcessorError"></exception>
+        public override void Start(string requestId, bool viewSql = false) {
+            Log.Debug(string.Format("ScannerAnalysisModelAggregator.Start(RequestId={0}, viewSQL={1}{2}", requestId, viewSql, ')'));
 
+            try {
+                var rLocationPath = Settings.GetAsString(Constants.Aggregator.Input.SettingsEnum.rLocation.ToString(), "");
+
+                var pmmlInputDocs = PmmlInputDocs;
+                var parametersJson = ParametersJson;
+
+                initializeParameters(ref parametersJson);
+                var siteNames = DesiredDocuments.Select(x => x.Filename).Select(x => x.Split('.')[0]).ToArray();
+
+                var requestParameter = new AggregatorServerRequestParameter(requestId, rLocationPath, pmmlInputDocs, parametersJson, siteNames);
+
+                var responseBase = Proxy.PostRequest(requestParameter);
+
+                if (responseBase.Status != Constants.ResponseStatus.Error) {
+                    if (responseBase == null) {
+                        throw new ModelProcessorError("Error in response", new Exception("Error in response"));
+                    }
+
+                    RequestStatus.Code = RequestStatus.StatusCode.InProgress;
+
+                    while (responseBase.Status == Constants.ResponseStatus.InProgress || responseBase.Status == Constants.ResponseStatus.Undefined) {
+                        Thread.Sleep(1000);
+                        responseBase = Proxy.GetStatus(requestParameter);
+                    }
+
+                    // this should cycle through and load up the document information as well as actual response JSON
+                    if (responseBase.Status != Constants.ResponseStatus.InProgress) {
+                        ResponseJsonPath = string.Format("{0}{1}.json", Path.GetTempPath(), Guid.NewGuid());
+
+                        addResponseDocuments(requestParameter);
+
+                        // Set completion status
+                        RequestStatus.Code = RequestStatus.StatusCode.Complete;
+                        RequestStatus.Message = string.Empty;
+                    } else {
+                        // I need to figure out the best error response here
+                        throw new ModelProcessorError("Error in response", new Exception("Error in response"));
+                    }
+                } else {
+                    Status(requestId).Code = RequestStatus.StatusCode.Error;
+                }
+            } catch (Exception ex) {
+                Log.Debug(ex);
+
+                //while (Statuses(requestId).Code == RequestStatus.StatusCode.InProgress) {
+                //    Thread.Sleep(10000);
+                //}
+
+                if (Status(requestId).Code == RequestStatus.StatusCode.Error) {
+                    throw new ModelProcessorError(ex.Message, ex);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Initializes the parameters.
+        /// </summary>
+        /// <param name="parametersJson">The parameters json.</param>
+        private void initializeParameters(ref string parametersJson) {
+            if (parametersJson.Contains("PMML.GeneralRegressionModel.Coefficients") == false) {
+                dynamic parametersObject = JsonConvert.DeserializeObject(parametersJson);
+
+                var target = parametersObject["PMML.GeneralRegressionModel.MiningSchema.MiningField.target"];
+                var interceptTag = string.Format("PMML.GeneralRegressionModel.Coefficients.{0}", VariableConstants.InterceptConst);
+                var targetTag = "PMML.GeneralRegressionModel.Coefficients." + target;
+
+                if (parametersObject[targetTag] == null) {
+                    parametersObject[interceptTag] = Constants.InitialCoefficient;
+                    parametersObject[targetTag] = Constants.InitialCoefficient;
+                    var active = parametersObject["PMML.GeneralRegressionModel.MiningSchema.MiningField.active"];
+                    int max = active.Count;
+                    var index = 0;
+
+                    while (index < max) {
+                        parametersObject["PMML.GeneralRegressionModel.Coefficients." + active[index]] = Constants.InitialCoefficient;
+                        index++;
+                    }
+
+                    parametersJson = JsonConvert.SerializeObject(parametersObject);
+                }
+            }
+        }
+
+        public string ResponseJsonPath { get; set; }
+
+        #endregion Model Processor Life Cycle Methods
+    }
 }

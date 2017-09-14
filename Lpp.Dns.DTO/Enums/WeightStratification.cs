@@ -5,18 +5,21 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace Lpp.Dns.DTO.Enums
-{
+namespace Lpp.Dns.DTO.Enums {
+
+    /// <summary>
+    /// </summary>
     [DataContract]
-    public enum WeightStratification
-    {
+    public enum WeightStratification {
+
         /// <summary>
-        /// Indicates 2 inch Group Stratification
+        ///     Indicates 2 inch Group Stratification
         /// </summary>
         [EnumMember, Description("10 lb Groups")]
         TenLbs = 10,
+
         /// <summary>
-        /// Indicates 2 inch Group Stratification
+        ///     Indicates 2 inch Group Stratification
         /// </summary>
         [EnumMember, Description("20 lb Groups")]
         TwentyLbs = 20,

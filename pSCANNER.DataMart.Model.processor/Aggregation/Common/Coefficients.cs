@@ -1,28 +1,26 @@
+using Lpp.Scanner.DataMart.Model.Processors.Common.ExtMethods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lpp.Scanner.DataMart.Model.Processors.Common.ExtMethods;
 
-
-namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
+namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
 
     public class Coefficients {
-        #region Fields
 
-        readonly IList<KeyValuePair<string, string>> _list = new List<KeyValuePair<string, string>>();
+        #region Fields
 
         /// <summary>
         /// Gets the target value.
         /// </summary>
-        /// <value>
-        /// The target value.
-        /// </value>
+        /// <value>The target value.</value>
         public string TargetValue { get; private set; }
 
-        #endregion
+        private readonly IList<KeyValuePair<string, string>> _list = new List<KeyValuePair<string, string>>();
+
+        #endregion Fields
 
         /// <summary>
-        ///     Adds the specified variable name.
+        /// Adds the specified variable name.
         /// </summary>
         /// <param name="varName">Name of the variable.</param>
         /// <param name="varValue">The variable value.</param>
@@ -32,18 +30,16 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         }
 
         /// <summary>
-        ///     Gets the coefficient list string.
+        /// Gets the coefficient list string.
         /// </summary>
         /// <returns></returns>
         public string GetCoefficientListString() {
             return _list
-                .Where(x =>
-                {
+                .Where(x => {
                     return x.Key.Equals(TargetValue, StringComparison.InvariantCultureIgnoreCase) == false;
-
                 })
                 .Select(x => x.Value)
-                
+
                 .Join(",");
         }
 
@@ -54,7 +50,5 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         public void setTarget(string targetValue) {
             TargetValue = targetValue;
         }
-
     }
-
 }

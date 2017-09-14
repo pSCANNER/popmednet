@@ -42,6 +42,15 @@
     <Reference Include="Lpp.QueryComposer">
       <HintPath>..\Dependencies\Lpp.QueryComposer.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop, Version=1.0.168.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -51,6 +60,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.4.0\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
@@ -62,19 +72,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Aggregation\Coefficients.cs" />
-    <Compile Include="Aggregation\PScannerAggregatorProxy.cs" />
-    <Compile Include="Aggregation\RScriptWriter.cs" />
+    <Compile Include="Aggregation\Common\Coefficients.cs" />
+    <Compile Include="Aggregation\Common\PScannerAggregatorProxy.cs" />
+    <Compile Include="Aggregation\Common\RScriptWriter.cs" />
     <Compile Include="Aggregation\ScannerAnalysisModelAggregator.cs" />
-    <Compile Include="Aggregation\ScriptConstants.cs" />
-    <Compile Include="Aggregation\SiteResponse.cs" />
-    <Compile Include="Aggregation\VariableEntry.cs" />
-    <Compile Include="Analysis\LocalConstants.cs" />
-    <Compile Include="Analysis\MiningFields.cs" />
-    <Compile Include="Analysis\ProcessorResponse.cs" />
-    <Compile Include="Analysis\PScannerProcessorProxy.cs" />
-    <Compile Include="Analysis\RequestParameterList.cs" />
-    <Compile Include="Analysis\RScriptWriter.cs" />
+    <Compile Include="Aggregation\Common\ScriptConstants.cs" />
+    <Compile Include="Aggregation\Common\SiteResponse.cs" />
+    <Compile Include="Aggregation\Common\VariableEntry.cs" />
+    <Compile Include="Analysis\Common\LocalConstants.cs" />
+    <Compile Include="Analysis\Common\MiningFields.cs" />
+    <Compile Include="Analysis\Common\ProcessorResponse.cs" />
+    <Compile Include="Analysis\Common\PScannerProcessorProxy.cs" />
+    <Compile Include="Analysis\Common\RequestParameterList.cs" />
+    <Compile Include="Analysis\Common\RScriptWriter.cs" />
     <Compile Include="Analysis\ScannerAnalysisModelProcessor.cs" />
     <Compile Include="Common\Base\BaseAdapterRequestParameter.cs" />
     <Compile Include="Common\Base\BaseProxyRequestParameter.cs" />
@@ -82,6 +92,7 @@
     <Compile Include="Common\Base\BaseScriptBuilder.cs" />
     <Compile Include="Common\Base\BaseScriptParser.cs" />
     <Compile Include="Common\Base\CellBase.cs" />
+    <Compile Include="Common\Base\InternalDocument.cs" />
     <Compile Include="Common\Base\MetaDataBase.cs" />
     <Compile Include="Common\Base\PmmlBase.cs" />
     <Compile Include="Common\Base\ProxyBase.cs" />
@@ -188,6 +199,7 @@
       <Name>Lpp.Dns.DTO</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\MSBuild.Extension.Pack.1.9.0\build\net40\MSBuild.Extension.Pack.targets" Condition="Exists('..\packages\MSBuild.Extension.Pack.1.9.0\build\net40\MSBuild.Extension.Pack.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -195,7 +207,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\MSBuild.Extension.Pack.1.9.0\build\net40\MSBuild.Extension.Pack.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSBuild.Extension.Pack.1.9.0\build\net40\MSBuild.Extension.Pack.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
   </Target>
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

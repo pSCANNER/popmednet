@@ -1,15 +1,14 @@
 ﻿#region Legal Information
 
 // ====================================================================================
-//  
-//      Center for Population Health Informatics
-//      Solution: Lpp.Adapters
-//      Project: Lpp.Scanner.DataMart.Model.Processors
-//      Last Updated By: Westerman, Dax Marek
-// 
+//
+// Center for Population Health Informatics
+// Solution: Lpp.Adapters
+// Project: Lpp.Scanner.DataMart.Model.Processors Last Updated By: Westerman, Dax Marek
+//
 // ====================================================================================
 
-#endregion
+#endregion Legal Information
 
 #region Using
 
@@ -21,30 +20,31 @@ using LinqKit;
 using Lpp.Scanner.DataMart.Model.Processors.Aggregation;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Base;
 using Lpp.Scanner.DataMart.Model.Processors.Common.ExtMethods;
+using Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common;
 
-
-#endregion
+#endregion Using
 
 namespace Lpp.Scanner.DataMart.Model.Processors.Common.Models {
 
     public class ErrorGradientModel : PmmlBase, IModelBase {
+
         #region Fields
 
         private readonly Dictionary<string, string> _values;
 
-        #endregion
+        #endregion Fields
 
         #region Constructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="ErrorGradientModel" /> class.
+        ///     Initializes a new instance of the <see cref="ErrorGradientModel"/> class.
         /// </summary>
         public ErrorGradientModel() {
             _values = new Dictionary<string, string>();
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="ErrorGradientModel" /> class.
+        ///     Initializes a new instance of the <see cref="ErrorGradientModel"/> class.
         /// </summary>
         /// <param name="pmml">The PMML.</param>
         public ErrorGradientModel(SiteResponse pmml) : base(pmml.SiteName, pmml.Response) {
@@ -58,23 +58,21 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Models {
             }
         }
 
-        #endregion
+        #endregion Constructors
 
         #region Properties
 
         /// <summary>
         ///     Gets or sets the values.
         /// </summary>
-        /// <value>
-        ///     The values.
-        /// </value>
+        /// <value>The values.</value>
         public IDictionary<string, string> Values {
             get {
                 return _values;
             }
         }
 
-        #endregion
+        #endregion Properties
 
         #region Interface Implementation
 
@@ -90,11 +88,10 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Models {
                 sb.AppendFormat("<error name=\"{0}\" value=\"{1}\" />", value.Key.DropPrefix("x"), value.Value);
                 sb.AppendLine();
             }
-            
+
             return sb.ToString();
         }
 
-        #endregion
+        #endregion Interface Implementation
     }
-
 }

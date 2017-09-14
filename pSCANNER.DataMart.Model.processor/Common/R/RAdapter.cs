@@ -79,7 +79,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.R {
             var request = (RRequestParameter) requestParameter;
             Response = new RResponse {
                 Status = Constants.ResponseStatus.InProgress,
-                Result = runScriptInR(request.Script, request.ExecutionPath, ResponseConversion, RequestParameter, Parameters)
+                Result = RunScriptInR(request.Script, request.ExecutionPath, ResponseConversion, RequestParameter, Parameters)
             };
             Response.Status = Constants.ResponseStatus.Complete;
             return Response;
@@ -127,7 +127,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.R {
         /// <param name="parameters"></param>
         /// <returns></returns>
         /// <exception cref="System.Exception">R failed to compute. Output:  + result</exception>
-        private static string runScriptInR(string script, string executionPath, Func<string, BaseRequestParameter, object[], string> responseConversion, BaseRequestParameter requestParameter, object[] parameters = null) {
+        private static string RunScriptInR(string script, string executionPath, Func<string, BaseRequestParameter, object[], string> responseConversion, BaseRequestParameter requestParameter, object[] parameters = null) {
 
             var output = string.Empty;
 

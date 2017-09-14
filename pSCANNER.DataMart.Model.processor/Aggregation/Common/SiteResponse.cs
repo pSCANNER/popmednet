@@ -1,23 +1,23 @@
 ﻿#region Legal Information
 
 // ====================================================================================
-//  
-//      Center for Population Health Informatics
-//      Solution: Lpp.Adapters
-//      Project: Lpp.Scanner.DataMart.Model.Processors
-//      Last Updated By: Westerman, Dax Marek
-// 
+//
+// Center for Population Health Informatics
+// Solution: Lpp.Adapters
+// Project: Lpp.Scanner.DataMart.Model.Processors Last Updated By: Westerman, Dax Marek
+//
 // ====================================================================================
 
-#endregion
+#endregion Legal Information
 
-namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
+namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
 
     public class SiteResponse {
+
         #region Constructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="SiteResponse" /> class.
+        /// Initializes a new instance of the <see cref="SiteResponse"/> class.
         /// </summary>
         /// <param name="siteName">Name of the site.</param>
         /// <param name="response">The response.</param>
@@ -26,27 +26,22 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
             Response = response;
         }
 
-        #endregion
+        #endregion Constructors
 
         #region Properties
 
         /// <summary>
-        ///     Gets or sets the response.
+        /// Gets or sets the response.
         /// </summary>
-        /// <value>
-        ///     The response.
-        /// </value>
+        /// <value>The response.</value>
         public string Response { get; set; }
 
         /// <summary>
-        ///     Gets or sets the name of the site.
+        /// Gets or sets the name of the site.
         /// </summary>
-        /// <value>
-        ///     The name of the site.
-        /// </value>
+        /// <value>The name of the site.</value>
         public string SiteName { get; set; }
 
-        #endregion
+        #endregion Properties
     }
-
 }
