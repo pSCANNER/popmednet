@@ -1,15 +1,14 @@
 ﻿#region Legal Information
 
 // ====================================================================================
-//  
-//      Center for Population Health Informatics
-//      Solution: Lpp.Adapters
-//      Project: Lpp.Scanner.DataMart.Model.Processors
-//      Last Updated By: Westerman, Dax Marek
-// 
+//
+// Center for Population Health Informatics
+// Solution: Lpp.Adapters
+// Project: Lpp.Scanner.DataMart.Model.Processors Last Updated By: Westerman, Dax Marek
+//
 // ====================================================================================
 
-#endregion
+#endregion Legal Information
 
 #region Using
 
@@ -20,16 +19,22 @@ using System.Reflection;
 using System.Xml;
 using Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.Configuration;
 
-
-#endregion
+#endregion Using
 
 namespace Lpp.Scanner.DataMart.Model.Processors.DataSetMapping {
 
+    /// <summary>
+    /// </summary>
+    /// <seealso cref="Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.IRegistry"/>
     public class AppConfigRegistry : IRegistry {
+
         #region Interface Implementation
 
+        /// <summary>
+        ///     Gets the data set connection element map.
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<string, DataSetConnectionElement> GetDataSetConnectionElementMap() {
-
             var retVal = new Dictionary<string, DataSetConnectionElement>();
 
             var xmlElement = getConfigXml();
@@ -53,11 +58,27 @@ namespace Lpp.Scanner.DataMart.Model.Processors.DataSetMapping {
             }
 
             return retVal;
-
         }
 
         /// <summary>
-        /// Gets the configuration XML.
+        ///     Gets the r section.
+        /// </summary>
+        /// <returns></returns>
+        public string getRSection() {
+            string retVal = string.Empty;
+            var xmlElement = getConfigXml();
+
+            foreach (XmlNode dataSet in xmlElement.ChildNodes) {
+                if (dataSet.Name == "setting" && dataSet.Attributes["name"].Value == "RSection") {
+                    retVal = dataSet.ChildNodes[0].InnerXml;
+                }
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
+        ///     Gets the configuration XML.
         /// </summary>
         /// <returns></returns>
         private static XmlElement getConfigXml() {
@@ -69,27 +90,6 @@ namespace Lpp.Scanner.DataMart.Model.Processors.DataSetMapping {
             return xmlElement;
         }
 
-        /// <summary>
-        /// Gets the r section.
-        /// </summary>
-        /// <returns></returns>
-        public string getRSection() {
-            string retVal = string.Empty;
-            var xmlElement = getConfigXml();
-
-            foreach (XmlNode dataSet in xmlElement.ChildNodes)
-            {
-                if (dataSet.Name == "setting" && dataSet.Attributes["name"].Value == "RSection")
-                {
-                    retVal = dataSet.ChildNodes[0].InnerXml;
-
-                }
-            }
-
-            return retVal;
-        }
-
-        #endregion
+        #endregion Interface Implementation
     }
-
 }

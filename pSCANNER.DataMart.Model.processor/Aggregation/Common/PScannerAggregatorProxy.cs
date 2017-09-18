@@ -36,6 +36,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
     /// <summary>
     /// </summary>
     /// <typeparam name="TTask">The type of the task.</typeparam>
+    /// <seealso cref="Lpp.Scanner.DataMart.Model.Processors.Common.Base.ProxyBase"/>
     /// <seealso cref="ProxyBase"/>
     public class PScannerAggregatorProxy<TTask> : ProxyBase where TTask : TaskBase {
 
@@ -165,7 +166,6 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         /// </summary>
         /// <param name="response">The response.</param>
         /// <param name="parameter">The parameter.</param>
-        /// <param name="?">The ?.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
         private static string convertToParametersJson(string response, BaseRequestParameter parameter, object[] parameters) {
@@ -319,12 +319,26 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
             return pCovMatrices.ToDictionary(x => x.SiteName, x => x);
         }
 
+        /// <summary>
+        ///     The name
+        /// </summary>
         private const string name = "name";
+
+        /// <summary>
+        ///     The pair
+        /// </summary>
         private const string pair = "pair";
+
+        /// <summary>
+        ///     The value
+        /// </summary>
         private const string value = "value";
 
         #region Fields
 
+        /// <summary>
+        ///     The tasks
+        /// </summary>
         private readonly Dictionary<string, TaskBase> _tasks = new Dictionary<string, TaskBase>();
 
         #endregion Fields
@@ -374,12 +388,19 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
 
             #region Fields
 
+            /// <summary>
+            ///     The variable description
+            /// </summary>
             private string _variableDescription;
 
             #endregion Fields
 
             #region Properties
 
+            /// <summary>
+            ///     Gets or sets the default value.
+            /// </summary>
+            /// <value>The default value.</value>
             public string DefaultValue { get; set; }
 
             /// <summary>

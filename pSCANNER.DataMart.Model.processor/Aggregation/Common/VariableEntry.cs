@@ -7,16 +7,23 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
 
         #region Fields
 
+        /// <summary>
+        ///     The variable description
+        /// </summary>
         private string _variableDescription;
 
         #endregion Fields
 
         #region Properties
 
+        /// <summary>
+        ///     Gets or sets the default value.
+        /// </summary>
+        /// <value>The default value.</value>
         public string DefaultValue { get; set; }
 
         /// <summary>
-        /// Gets the variable description.
+        ///     Gets the variable description.
         /// </summary>
         /// <value>The variable description.</value>
         public string VariableDescription {
@@ -29,7 +36,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         }
 
         /// <summary>
-        /// Gets the name of the variable.
+        ///     Gets the name of the variable.
         /// </summary>
         /// <value>The name of the variable.</value>
         public string VariableName { get; set; }
@@ -37,7 +44,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         #endregion Properties
 
         /// <summary>
-        /// Returns a <see cref="System.String"/> that represents this instance.
+        ///     Returns a <see cref="System.String"/> that represents this instance.
         /// </summary>
         /// <returns>A <see cref="System.String"/> that represents this instance.</returns>
         public override string ToString() {

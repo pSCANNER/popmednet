@@ -169,7 +169,7 @@
     <Compile Include="Study\ScannerStudyModelTermProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Analysis\expressoProject\status.xso" />
+    <None Include="Analysis\_archive\expressoProject\status.xso" />
     <None Include="App.config" />
     <None Include="Common\Pmml\PMML.xsd">
       <SubType>Designer</SubType>

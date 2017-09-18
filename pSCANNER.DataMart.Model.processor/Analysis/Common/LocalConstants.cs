@@ -20,6 +20,9 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         [Description("DatabaseDataSetConnection")]
         SqlDataBase,
 
+        /// <summary>
+        ///     The undefined
+        /// </summary>
         [Description("")]
         Undefined
     }

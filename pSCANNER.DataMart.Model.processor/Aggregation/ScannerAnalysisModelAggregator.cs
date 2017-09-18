@@ -33,6 +33,9 @@ using System.Threading;
 
 namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
 
+    /// <summary>
+    /// </summary>
+    /// <seealso cref="Lpp.Scanner.DataMart.Model.Processors.Common.Base.ScannerBase"/>
     [Serializable]
     public class ScannerAnalysisModelAggregator : ScannerBase {
 
@@ -118,6 +121,9 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
 
         #region ScannerAggregationModelMetadata
 
+        /// <summary>
+        /// </summary>
+        /// <seealso cref="Lpp.Scanner.DataMart.Model.Processors.Common.Base.MetaDataBase"/>
         [Serializable]
         internal class ScannerAggregationModelMetadata : MetaDataBase {
 
@@ -215,6 +221,9 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
             }
         }
 
+        /// <summary>
+        ///     The PMML capture
+        /// </summary>
         private static readonly Regex _pmmlCapture = new Regex(@"<\?xml[\s\w="".-]+\?>.+?</PMML>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
         #endregion Setup
@@ -267,7 +276,10 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         /// </summary>
         /// <param name="requestId">The request identifier.</param>
         /// <param name="viewSql">if set to <c>true</c> [view SQL].</param>
-        /// <exception cref="ModelProcessorError"></exception>
+        /// <exception cref="ModelProcessorError">
+        ///     Error in response - new Exception("Error in response") or Error in response - new Exception("Error in response") or
+        /// </exception>
+        /// <exception cref="Exception">Error in response or Error in response</exception>
         public override void Start(string requestId, bool viewSql = false) {
             Log.Debug(string.Format("ScannerAnalysisModelAggregator.Start(RequestId={0}, viewSQL={1}{2}", requestId, viewSql, ')'));
 
@@ -354,6 +366,10 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
             }
         }
 
+        /// <summary>
+        ///     Gets or sets the response json path.
+        /// </summary>
+        /// <value>The response json path.</value>
         public string ResponseJsonPath { get; set; }
 
         #endregion Model Processor Life Cycle Methods

@@ -10,18 +10,21 @@ using System.Linq;
 
 namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
 
+    /// <summary>
+    /// </summary>
     public static class RScriptWriter {
 
         /// <summary>
-        /// Generates the r script from p cov matrices.
+        ///     Generates the r script from p cov matrices.
         /// </summary>
         /// <param name="pCovMatricesPerSite">The p cov matrices per site.</param>
         /// <param name="errorGradientPerSite">The error gradient per site.</param>
         /// <param name="coefficients">The coefficients.</param>
         /// <param name="dataFields">The data fields.</param>
-        /// <param name="aggregationCount"></param>
-        /// <param name="maxAggregationCount"></param>
+        /// <param name="aggregationCount">The aggregation count.</param>
+        /// <param name="maxAggregationCount">The maximum aggregation count.</param>
         /// <returns></returns>
+        /// <exception cref="NullReferenceException">pCovMatricesPerSite</exception>
         /// <exception cref="System.NullReferenceException">pCovMatricesPerSite</exception>
         public static string GenerateRScript(IDictionary<string, PCovMatrix> pCovMatricesPerSite, IDictionary<string, ErrorGradientModel> errorGradientPerSite, Coefficients coefficients, IEnumerable<string> dataFields, int aggregationCount, int maxAggregationCount) {
             if (pCovMatricesPerSite == null) {
@@ -65,7 +68,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         }
 
         /// <summary>
-        /// Calculates the new coefficients.
+        ///     Calculates the new coefficients.
         /// </summary>
         /// <param name="scriptBuilder">The script builder.</param>
         private static void calculateNewCoefficients(RScriptBuilder scriptBuilder) {
@@ -82,7 +85,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         }
 
         /// <summary>
-        /// Initializes the covariance matrix.
+        ///     Initializes the covariance matrix.
         /// </summary>
         /// <param name="scriptBuilder">The script builder.</param>
         /// <param name="pCovMatricesPerSite">The p cov matrices per site.</param>
@@ -132,10 +135,10 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         }
 
         /// <summary>
-        /// Initializes the gradient error.
+        ///     Initializes the gradient error.
         /// </summary>
         /// <param name="scriptBuilder">The script builder.</param>
-        /// <param name="errorGradientPerSite"></param>
+        /// <param name="errorGradientPerSite">The error gradient per site.</param>
         /// <exception cref="System.NotImplementedException"></exception>
         private static void initGradientError(BaseScriptBuilder scriptBuilder, IDictionary<string, ErrorGradientModel> errorGradientPerSite) {
             scriptBuilder.AddLine("{0} <- array({1}, c({2}, 1, {3}))", ScriptConstants._errorMatrix.ToString(), ScriptConstants._errorMatrix.DefaultValue, ScriptConstants._columnCount.ToString(), ScriptConstants._siteCount.ToString());
@@ -165,7 +168,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         }
 
         /// <summary>
-        /// Initializes the sd true.
+        ///     Initializes the sd true.
         /// </summary>
         /// <param name="scriptBuilder">The script builder.</param>
         /// <exception cref="System.NotImplementedException"></exception>
@@ -174,17 +177,17 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         }
 
         /// <summary>
-        /// Sets the feature number.
+        ///     Sets the feature number.
         /// </summary>
         /// <param name="scriptBuilder">The script builder.</param>
-        /// <param name="numberFeatures"></param>
+        /// <param name="numberFeatures">The number features.</param>
         /// <exception cref="System.NotImplementedException"></exception>
         private static void setFeatureNumber(BaseScriptBuilder scriptBuilder, int numberFeatures) {
             scriptBuilder.AddLine("{1} <- {0}", numberFeatures.ToString(), ScriptConstants._columnCount.ToString());
         }
 
         /// <summary>
-        /// Writes the out features.
+        ///     Writes the out features.
         /// </summary>
         /// <param name="scriptBuilder">The script builder.</param>
         /// <param name="features">The features.</param>
@@ -202,13 +205,14 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
 
         /// <summary>
         /// </summary>
+        /// <seealso cref="System.Collections.Generic.IEqualityComparer{System.String}"/>
         /// <seealso cref="Lpp.Scanner.DataMart.Model.Processors.Common.Base.ProxyBase"/>
         private class StringListComparer : IEqualityComparer<string> {
 
             #region Interface Implementation
 
             /// <summary>
-            /// Determines whether the specified objects are equal.
+            ///     Determines whether the specified objects are equal.
             /// </summary>
             /// <param name="x">The first object of type <paramref name="T"/> to compare.</param>
             /// <param name="y">The second object of type <paramref name="T"/> to compare.</param>
@@ -218,7 +222,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
             }
 
             /// <summary>
-            /// Returns a hash code for this instance.
+            ///     Returns a hash code for this instance.
             /// </summary>
             /// <param name="obj">The object.</param>
             /// <returns>A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.</returns>

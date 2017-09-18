@@ -12,12 +12,14 @@
 
 namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
 
+    /// <summary>
+    /// </summary>
     public class SiteResponse {
 
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SiteResponse"/> class.
+        ///     Initializes a new instance of the <see cref="SiteResponse"/> class.
         /// </summary>
         /// <param name="siteName">Name of the site.</param>
         /// <param name="response">The response.</param>
@@ -31,13 +33,13 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         #region Properties
 
         /// <summary>
-        /// Gets or sets the response.
+        ///     Gets or sets the response.
         /// </summary>
         /// <value>The response.</value>
         public string Response { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the site.
+        ///     Gets or sets the name of the site.
         /// </summary>
         /// <value>The name of the site.</value>
         public string SiteName { get; set; }

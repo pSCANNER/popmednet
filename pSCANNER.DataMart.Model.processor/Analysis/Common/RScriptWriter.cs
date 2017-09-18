@@ -67,7 +67,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
 
             rSection = HttpUtility.HtmlDecode(rSection);
 
-            return buildScript(parameter, family, miningFields, independentVariables, coefficientValues, rSection);
+            return BuildScript(parameter, family, miningFields, independentVariables, coefficientValues, rSection);
         }
 
         /// <summary>
@@ -80,14 +80,14 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         /// <param name="coefficientValues">The coefficient values.</param>
         /// <param name="rSection">The r section.</param>
         /// <returns></returns>
-        private static string buildScript(AggregatorClientRequestParameter parameter, string family, MiningFields miningFields, string[] independentVariables, string coefficientValues, string rSection) {
+        private static string BuildScript(AggregatorClientRequestParameter parameter, string family, MiningFields miningFields, string[] independentVariables, string coefficientValues, string rSection) {
             var rScriptBuilder = new RScriptBuilder("Aggregator - Site Code");
 
             rScriptBuilder.AddLine(@"{0} <- ""{1}""", LocalConstants.FamilyName, family);
 
             rScriptBuilder.AddRequirement("glmnet");
 
-            rScriptBuilder.AddLine(createDataConnectionString(parameter.DataSetConnection.GetType(), parameter.DataSetConnection));
+            rScriptBuilder.AddLine(CreateDataConnectionString(parameter.DataSetConnection.GetType(), parameter.DataSetConnection));
 
             rScriptBuilder.AddLine(@"y <- {1}[, ""{0}""]", miningFields.DependantVariable, LocalConstants.DataSet);
 
@@ -104,11 +104,11 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
             if (string.IsNullOrWhiteSpace(rSection)) {
                 rScriptBuilder.AddLine("glm.sitedetail <- summary(glm.site);");
                 rScriptBuilder.AddLine("x_ <- model.matrix(glm.site$terms);");
-                rScriptBuilder.AddLine("p1<-coefficients%*%t(x_)");
-                rScriptBuilder.AddLine("p <-family(glm.s)$linkinv(eta =p1)");
-                rScriptBuilder.AddLine("w<-diag(c(p*(1-p)));");
+                rScriptBuilder.AddLine("p1 <- coefficients%*%t(x_)");
+                rScriptBuilder.AddLine("p <- family(glm.s)$linkinv(eta =p1)");
+                rScriptBuilder.AddLine("w <- diag(c(p*(1-p)));");
                 rScriptBuilder.AddLine("glm.sitedetail$gradient <- t(x_)%*%(y-p);");
-                rScriptBuilder.AddLine("glm.sitedetail$cov.new <-t(x_)%*%w%*%x_;");
+                rScriptBuilder.AddLine("glm.sitedetail$cov.new <- t(x_)%*%w%*%x_;");
             } else {
                 rScriptBuilder.AddLine(rSection);
             }
@@ -129,7 +129,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         /// <param name="connection">The connection.</param>
         /// <returns></returns>
         /// <exception cref="UnexpectedSwitchValue"></exception>
-        private static string createDataConnectionString(Type type, BaseDataSetConnection connection) {
+        private static string CreateDataConnectionString(Type type, BaseDataSetConnection connection) {
             string readString;
 
             ConnectAs connectAs = ConnectAs.Undefined;

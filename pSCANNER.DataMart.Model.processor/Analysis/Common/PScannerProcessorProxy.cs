@@ -29,13 +29,14 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
 
     /// <summary>
     /// </summary>
+    /// <seealso cref="Lpp.Scanner.DataMart.Model.Processors.Common.Base.ProxyBase"/>
     /// <seealso cref="ProxyBase"/>
     public class PScannerProcessorProxy : ProxyBase {
 
         /// <summary>
         ///     Gets the response.
         /// </summary>
-        /// <param name="requestParameter"></param>
+        /// <param name="requestParameter">The request parameter.</param>
         /// <returns></returns>
         /// <exception cref="System.NotImplementedException"></exception>
         public override ResponseBase DoGetResponse(BaseRequestParameter requestParameter) {
@@ -72,7 +73,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         /// <summary>
         ///     Gets the status.
         /// </summary>
-        /// <param name="requestParameter"></param>
+        /// <param name="requestParameter">The request parameter.</param>
         /// <returns></returns>
         /// <exception cref="System.NotImplementedException"></exception>
         public override ResponseBase DoGetStatus(BaseRequestParameter requestParameter) {
@@ -104,8 +105,9 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         /// <summary>
         ///     Posts the request.
         /// </summary>
-        /// <param name="parameter"></param>
+        /// <param name="parameter">The parameter.</param>
         /// <returns></returns>
+        /// <exception cref="NullReferenceException"></exception>
         public override ResponseBase DoPostRequest(BaseRequestParameter parameter) {
             BaseAdapter adapter;
             BaseRequestParameter adapterParameter;
@@ -166,6 +168,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         ///     Converts the json PMML to XML PMML.
         /// </summary>
         /// <param name="pmmlRequest">The PMML request.</param>
+        /// <param name="encode">if set to <c>true</c> [encode].</param>
         /// <returns></returns>
         private static string convertJsonPmmlToXmlPmml(string pmmlRequest, bool encode = true) {
             var pmmlDocument = PmmlParser.CreateFromJson(pmmlRequest);
@@ -420,6 +423,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         /// </summary>
         /// <param name="analysisParameters">The analysis parameters.</param>
         /// <param name="combined">The combined.</param>
+        /// <exception cref="NullReferenceException">combinedJsonObject or analysisDataSetObject</exception>
         /// <exception cref="System.NullReferenceException">combinedJsonObject or analysisDataSetObject</exception>
         private void mergeAnalysisParametersIntoAnalysisPmml(string analysisParameters, ref string combined) {
             var combinedJsonObject = JObject.Parse(combined);
@@ -552,7 +556,16 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
             combined = combinedJsonObject.ToString();
         }
 
+        /// <summary>
+        ///     Gets or sets the aggregation count.
+        /// </summary>
+        /// <value>The aggregation count.</value>
         public int AggregationCount { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the maximum iterations value.
+        /// </summary>
+        /// <value>The maximum iterations value.</value>
         public int MaxIterationsVal { get; set; }
 
         /// <summary>
@@ -582,7 +595,14 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
             }
         }
 
+        /// <summary>
+        ///     The log
+        /// </summary>
         private static readonly string _log = "Application";
+
+        /// <summary>
+        ///     The source
+        /// </summary>
         private static readonly string _source = "DMC-PScannerProcessorProxy";
     }
 }

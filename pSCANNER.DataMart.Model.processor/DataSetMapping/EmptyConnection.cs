@@ -1,33 +1,29 @@
 ﻿#region Legal Information
 
 // ====================================================================================
-//  
-//      Center for Population Health Informatics
-//      Solution: Lpp.Adapters
-//      Project: Lpp.Scanner.DataMart.Model.Processors
-//      Last Updated By: Westerman, Dax Marek
-// 
+//
+// Center for Population Health Informatics
+// Solution: Lpp.Adapters
+// Project: Lpp.Scanner.DataMart.Model.Processors Last Updated By: Westerman, Dax Marek
+//
 // ====================================================================================
 
-#endregion
-
-#region Using
-
-
-
-#endregion
+#endregion Legal Information
 
 namespace Lpp.Scanner.DataMart.Model.Processors.DataSetMapping {
 
+    /// <summary>
+    /// </summary>
+    /// <seealso cref="Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.BaseDataSetConnection"/>
     public class EmptyConnection : BaseDataSetConnection {
+
         #region Constructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="EmptyConnection" /> class.
+        ///     Initializes a new instance of the <see cref="EmptyConnection"/> class.
         /// </summary>
-        public EmptyConnection() : base(null) {}
+        public EmptyConnection() : base(null) { }
 
-        #endregion
+        #endregion Constructors
     }
-
 }

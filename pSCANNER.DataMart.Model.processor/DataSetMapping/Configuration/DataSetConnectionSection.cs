@@ -1,25 +1,26 @@
 ﻿#region Legal Information
 
 // ====================================================================================
-//  
-//      Center for Population Health Informatics
-//      Solution: Lpp.Adapters
-//      Project: Lpp.Scanner.DataMart.Model.Processors
-//      Last Updated By: Westerman, Dax Marek
-// 
+//
+// Center for Population Health Informatics
+// Solution: Lpp.Adapters
+// Project: Lpp.Scanner.DataMart.Model.Processors Last Updated By: Westerman, Dax Marek
+//
 // ====================================================================================
 
-#endregion
+#endregion Legal Information
 
 #region Using
 
 using System.Configuration;
 
-
-#endregion
+#endregion Using
 
 namespace Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.Configuration {
 
+    /// <summary>
+    /// </summary>
+    /// <seealso cref="System.Configuration.ConfigurationSection"/>
     public class DataSetConnectionSection : ConfigurationSection {
 
         /// <summary>
@@ -27,19 +28,25 @@ namespace Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.Configuration {
         /// </summary>
         public const string SectionName = "DataSetConnectionSection";
 
+        /// <summary>
+        ///     The data set connection name
+        /// </summary>
         private const string dataSetConnectionName = "DataSetConnections";
 
         #region Properties
 
+        /// <summary>
+        ///     Gets the data set connections.
+        /// </summary>
+        /// <value>The data set connections.</value>
         [ConfigurationProperty(dataSetConnectionName)]
         [ConfigurationCollection(typeof(DataSetConnectionCollection), AddItemName = "add")]
         public DataSetConnectionCollection DataSetConnections {
             get {
-                return (DataSetConnectionCollection) base[dataSetConnectionName];
+                return (DataSetConnectionCollection)base[dataSetConnectionName];
             }
         }
 
-        #endregion
+        #endregion Properties
     }
-
 }

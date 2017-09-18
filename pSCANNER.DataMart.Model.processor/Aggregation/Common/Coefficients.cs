@@ -5,22 +5,27 @@ using System.Linq;
 
 namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
 
+    /// <summary>
+    /// </summary>
     public class Coefficients {
 
         #region Fields
 
         /// <summary>
-        /// Gets the target value.
+        ///     Gets the target value.
         /// </summary>
         /// <value>The target value.</value>
         public string TargetValue { get; private set; }
 
+        /// <summary>
+        ///     The list
+        /// </summary>
         private readonly IList<KeyValuePair<string, string>> _list = new List<KeyValuePair<string, string>>();
 
         #endregion Fields
 
         /// <summary>
-        /// Adds the specified variable name.
+        ///     Adds the specified variable name.
         /// </summary>
         /// <param name="varName">Name of the variable.</param>
         /// <param name="varValue">The variable value.</param>
@@ -30,7 +35,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         }
 
         /// <summary>
-        /// Gets the coefficient list string.
+        ///     Gets the coefficient list string.
         /// </summary>
         /// <returns></returns>
         public string GetCoefficientListString() {
@@ -44,7 +49,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         }
 
         /// <summary>
-        /// Sets the target.
+        ///     Sets the target.
         /// </summary>
         /// <param name="targetValue">The target value.</param>
         public void setTarget(string targetValue) {

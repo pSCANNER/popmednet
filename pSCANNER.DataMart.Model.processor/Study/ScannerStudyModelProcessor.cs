@@ -1,15 +1,14 @@
 ﻿#region Legal Information
 
 // ====================================================================================
-//  
-//      Center for Population Health Informatics
-//      Solution: Lpp.Adapters
-//      Project: Lpp.Scanner.DataMart.Model.Processors
-//      Last Updated By: Westerman, Dax Marek
-// 
+//
+// Center for Population Health Informatics
+// Solution: Lpp.Adapters
+// Project: Lpp.Scanner.DataMart.Model.Processors Last Updated By: Westerman, Dax Marek
+//
 // ====================================================================================
 
-#endregion
+#endregion Legal Information
 
 #region Using
 
@@ -27,15 +26,36 @@ using Lpp.Dns.DTO.Scanner;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 
-
-#endregion
+#endregion Using
 
 namespace Lpp.Scanner.DataMart.Model.Processors.Study {
 
+    /// <summary>
+    /// </summary>
+    /// <seealso cref="Lpp.Dns.DataMart.Model.IModelProcessor"/>
     [Serializable]
     public class ScannerStudyModelProcessor : IModelProcessor {
 
-        private const string PROCESSOR_ID = "594CFFDC-4C19-492E-9A85-147378B28405";
+        /// <summary>
+        ///     Serializes the site protocols to HTML.
+        /// </summary>
+        /// <param name="siteProtocols">The site protocols.</param>
+        /// <returns></returns>
+        private string SerializeSiteProtocolsToHTML(ScannerStudySiteProtocolsDTO siteProtocols) {
+            var sb = new StringBuilder();
+            sb.AppendLine("");
+            foreach (var protocol in siteProtocols.Protocols) {
+                sb.AppendLine("                <tr>" + "<td>" + WebUtility.HtmlEncode(protocol.LibraryName) + "</td>" + "<td>" + WebUtility.HtmlEncode(protocol.MethodName) + "</td>" + "<td>" + WebUtility.HtmlEncode(protocol.DataSetName) + "</td>" + "<td>" + WebUtility.HtmlEncode(protocol.ResultReleaseName) + "</td>" + "</tr>");
+            }
+            sb.AppendLine("");
+            var studyProtocols = sb.ToString().TrimEnd();
+
+            return string.Format(HtmlTemplate, /* 0 */ requestDataMartName, /* 1 */ studyProtocols);
+        }
+
+        /// <summary>
+        ///     The HTML template
+        /// </summary>
         private const string HtmlTemplate = @"<html>
           <body style=""font-family: Calibri; font-size: font-size: 16px;"">
             <table style=""border-style:solid; border-width: 2px; width: 620px; margin:4px; padding:4px"">
@@ -58,23 +78,36 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Study {
           </body>
         </html>";
 
+        /// <summary>
+        ///     The processor identifier
+        /// </summary>
+        private const string PROCESSOR_ID = "594CFFDC-4C19-492E-9A85-147378B28405";
+
+        /// <summary>
+        ///     The log
+        /// </summary>
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Fields
 
+        /// <summary>
+        ///     The model metadata
+        /// </summary>
         private readonly IModelMetadata modelMetadata = new ScannerStudyModelMetadata();
+
+        /// <summary>
+        ///     The request properties
+        /// </summary>
         private IDictionary<string, IDictionary<string, string>> requestProperties; // Key: requestId, Value: Request Properties
 
-        #endregion
+        #endregion Fields
 
         #region Properties
 
         /// <summary>
         ///     Gets the model metadata.
         /// </summary>
-        /// <value>
-        ///     The model metadata.
-        /// </value>
+        /// <value>The model metadata.</value>
         public IModelMetadata ModelMetadata {
             get {
                 return modelMetadata;
@@ -84,42 +117,57 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Study {
         /// <summary>
         ///     Gets the model processor identifier.
         /// </summary>
-        /// <value>
-        ///     The model processor identifier.
-        /// </value>
+        /// <value>The model processor identifier.</value>
         public Guid ModelProcessorId {
             get {
                 return Guid.Parse(PROCESSOR_ID);
             }
         }
 
+        /// <summary>
+        ///     Gets or sets the settings.
+        /// </summary>
+        /// <value>The settings.</value>
         public IDictionary<string, object> Settings { get; set; }
 
-        #endregion
+        #endregion Properties
 
+        /// <summary>
+        /// </summary>
+        /// <seealso cref="Lpp.Dns.DataMart.Model.IModelMetadata"/>
         [Serializable]
         internal class ScannerStudyModelMetadata : IModelMetadata {
 
+            /// <summary>
+            ///     The model identifier
+            /// </summary>
             private const string MODEL_ID = "D01D1941-240E-411B-BB26-BA063CD463BE"; // ID for Scanner Study model
 
             #region Fields
 
+            /// <summary>
+            ///     The capabilities
+            /// </summary>
             private readonly IDictionary<string, bool> capabilities;
+
+            /// <summary>
+            ///     The properties
+            /// </summary>
             private readonly IDictionary<string, string> properties;
 
-            #endregion
+            #endregion Fields
 
             #region Constructors
 
             /// <summary>
-            ///     Initializes a new instance of the <see cref="ScanneAnalysisModelMetadata" /> class.
+            ///     Initializes a new instance of the <see cref="ScanneAnalysisModelMetadata"/> class.
             /// </summary>
             public ScannerStudyModelMetadata() {
-                capabilities = new Dictionary<string, bool> {{"IsSingleton", true}, {"RequiresConfig", false}, {"AddFiles", true}, {"CanRunAndUpload", true}, {"CanUploadWithoutRun", true}};
-                properties = new Dictionary<string, string> {{"LibraryMethodLocation", "C:\\_LibraryMethodCache"}};
+                capabilities = new Dictionary<string, bool> { { "IsSingleton", true }, { "RequiresConfig", false }, { "AddFiles", true }, { "CanRunAndUpload", true }, { "CanUploadWithoutRun", true } };
+                properties = new Dictionary<string, string> { { "LibraryMethodLocation", "C:\\_LibraryMethodCache" } };
             }
 
-            #endregion
+            #endregion Constructors
 
             #region Properties
 
@@ -165,7 +213,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Study {
             public ICollection<ProcessorSetting> Settings {
                 get {
                     var settings = new List<ProcessorSetting>();
-                    settings.Add(new ProcessorSetting {Title = "Library/Method Location", Key = "LibraryMethodLocation", DefaultValue = "C:\\_LibraryMethodCache", ValueType = typeof(string), Required = true});
+                    settings.Add(new ProcessorSetting { Title = "Library/Method Location", Key = "LibraryMethodLocation", DefaultValue = "C:\\_LibraryMethodCache", ValueType = typeof(string), Required = true });
                     return settings;
                 }
             }
@@ -188,11 +236,16 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Study {
                 }
             }
 
-            #endregion
+            #endregion Properties
         }
 
         #region Private Methods
 
+        /// <summary>
+        ///     Gets the type of the MIME.
+        /// </summary>
+        /// <param name="fileName">Name of the file.</param>
+        /// <returns></returns>
         private string GetMimeType(string fileName) {
             var mimeType = "application/octet-stream";
             var ext = Path.GetExtension(fileName).ToLower();
@@ -203,75 +256,83 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Study {
             return mimeType;
         }
 
-        #endregion
-
-        private string SerializeSiteProtocolsToHTML(ScannerStudySiteProtocolsDTO siteProtocols) {
-            var sb = new StringBuilder();
-            sb.AppendLine("");
-            foreach (var protocol in siteProtocols.Protocols) {
-                sb.AppendLine("                <tr>" + "<td>" + WebUtility.HtmlEncode(protocol.LibraryName) + "</td>" + "<td>" + WebUtility.HtmlEncode(protocol.MethodName) + "</td>" + "<td>" + WebUtility.HtmlEncode(protocol.DataSetName) + "</td>" + "<td>" + WebUtility.HtmlEncode(protocol.ResultReleaseName) + "</td>" + "</tr>");
-            }
-            sb.AppendLine("");
-            var studyProtocols = sb.ToString().TrimEnd();
-
-            return string.Format(HtmlTemplate, /* 0 */ requestDataMartName, /* 1 */ studyProtocols);
-        }
+        #endregion Private Methods
 
         #region Model Processor Life Cycle Methods
 
-        public class InternalDocument {
-            #region Constructors
+        /// <summary>
+        ///     Appends a file to the list of response PmmlInputDocuments.
+        /// </summary>
+        /// <param name="requestId">Request instance id</param>
+        /// <param name="filePath">Local path to the file to attach</param>
+        /// <exception cref="ModelProcessorError"></exception>
+        public void AddResponseDocument(string requestId, string filePath) {
+            log.Debug("ScannerStudyModelProcessor:AddResponseDocument: RequestId=" + requestId + ", filePath=" + filePath);
 
-            public InternalDocument(Document Doc, string Path, long Size) {
-                document = Doc;
-                document.Size = Convert.ToInt32(Size);
-                path = Path;
-                size = Size;
+            try {
+                var document = new Document(Guid.NewGuid().ToString(), GetMimeType(filePath), Path.GetFileName(filePath));
+                var fileInfo = new FileInfo(filePath);
+                responseDocuments.Add(new InternalDocument(document, filePath, fileInfo.Length));
+            } catch (Exception ex) {
+                log.Debug(ex);
+                throw new ModelProcessorError(ex.Message, ex);
             }
 
-            #endregion
-
-            #region Properties
-
-            public Document document { get; set; }
-
-            public string path { get; set; }
-
-            public long size { get; set; }
-
-            #endregion
+            status.Code = RequestStatus.StatusCode.AwaitingResponseApproval;
         }
-
-        private Guid requestTypeId = Guid.Empty;
-        private string requestDataMartName = "";
-        private Document[] desiredDocuments;
-        private readonly RequestStatus status = new RequestStatus(RequestStatus.StatusCode.Pending);
-        private string requestJson;
-        private string responseJson;
-        private string responseHtml;
-        private readonly List<InternalDocument> responseDocuments = new List<InternalDocument>();
 
         /// <summary>
-        ///     Associates the request properties for the specified request.
+        ///     Closes the specified request. Local and memory resident data for the request will be cleaned up. Closed request cannot be restarted.
         /// </summary>
-        /// <param name="requestId">Values set by user for the model's properties</param>
-        /// <param name="requestProperties">Values of properties associated with the request</param>
-        public void SetRequestProperties(string requestId, IDictionary<string, string> requestProperties) {
-            if (this.requestProperties == null) {
-                this.requestProperties = new Dictionary<string, IDictionary<string, string>>();
-            }
-
-            if (requestProperties == null) {
-                return;
-            }
-
-            if (!this.requestProperties.ContainsKey(requestId)) {
-                this.requestProperties.Add(requestId, requestProperties);
-            } else {
-                this.requestProperties[requestId] = requestProperties;
-            }
+        /// <param name="requestId">Request instance id</param>
+        /// <exception cref="NotImplementedException"></exception>
+        public void Close(string requestId) {
+            log.Debug("ScannerStudyModelProcessor:Close: RequestId=" + requestId);
         }
 
+        /// <summary>
+        ///     Runs the post processor. This method is called by the model processor only if the status returned has a message to be displayed and the user
+        ///     responded "yes".
+        /// </summary>
+        /// <param name="requestId"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        public void PostProcess(string requestId) {
+            log.Debug("ScannerStudyModelProcessor:PostProcess: RequestId=" + requestId);
+        }
+
+        /// <summary>
+        ///     Removes the response document.
+        /// </summary>
+        /// <param name="requestId">The request identifier.</param>
+        /// <param name="documentId"></param>
+        /// <exception cref="ModelProcessorError"></exception>
+        public void RemoveResponseDocument(string requestId, string documentId) {
+            log.Debug("ScannerStudyModelProcessor:RemoveResponseDocument: RequestId=" + requestId + ", documentId=" + documentId);
+
+            try {
+                IList<Document> documents = new List<Document>();
+                foreach (var idoc in responseDocuments) {
+                    if (idoc.document.DocumentID == documentId) {
+                        responseDocuments.Remove(idoc);
+                        break;
+                    }
+                }
+            } catch (Exception ex) {
+                log.Debug(ex);
+                throw new ModelProcessorError(ex.Message, ex);
+            }
+            status.Code = (responseDocuments == null || responseDocuments.Count == 0) ? RequestStatus.StatusCode.Pending : RequestStatus.StatusCode.AwaitingResponseApproval;
+        }
+
+        /// <summary>
+        ///     Requests the specified request identifier.
+        /// </summary>
+        /// <param name="requestId">The request identifier.</param>
+        /// <param name="network">The network.</param>
+        /// <param name="md">The md.</param>
+        /// <param name="requestDocuments">The request documents.</param>
+        /// <param name="requestProperties">The request properties.</param>
+        /// <param name="desiredDocuments">The desired documents.</param>
         public void Request(string requestId, NetworkConnectionMetadata network, RequestMetadata md, Document[] requestDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments) {
             log.Debug("ScannerStudyModelProcessor:Request: RequestId=" + requestId + ", doc count=" + (requestDocuments == null ? 0 : requestDocuments.Length));
 
@@ -299,6 +360,70 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Study {
                     requestJson = reader.ReadToEnd();
                     log.Debug("ScannerStudyModelProcessor:RequestDocument: RequestId=" + requestId + ", doc.Filename=" + doc.Filename + ", requestJson=" + requestJson);
                 }
+            }
+        }
+
+        /// <summary>
+        ///     Returns information about the list of PmmlInputDocuments that can be returned. Called when RequestStatus is Complete. Does not return actual contents.
+        /// </summary>
+        /// <param name="requestId"></param>
+        /// <returns>List of response PmmlInputDocuments</returns>
+        /// <exception cref="ModelProcessorError"></exception>
+        public Document[] Response(string requestId) {
+            log.Debug("ScannerStudyModelProcessor:Response: RequestId=" + requestId);
+            return responseDocuments.Select(idoc => idoc.document).ToArray();
+        }
+
+        /// <summary>
+        ///     Gets input stream for the specified Document.
+        /// </summary>
+        /// <param name="requestId">Request instance idr</param>
+        /// <param name="documentId">The id of the document being transferred</param>
+        /// <param name="contentStream">Stream pointer to a specified Document</param>
+        /// <param name="maxSize">Maximum chunk size (returned chunk may be smaller)</param>
+        public void ResponseDocument(string requestId, string documentId, out Stream contentStream, int maxSize) {
+            log.Debug("ScannerStudyModelProcessor:ResponseDocument: RequestId=" + requestId + ", documentId=" + documentId);
+
+            contentStream = null;
+
+            if (documentId == "0") // response JSON string
+            {
+                contentStream = new MemoryStream(Encoding.UTF8.GetBytes(responseJson));
+
+                return;
+            }
+
+            if (documentId == "1") // response HTML string
+            {
+                contentStream = new MemoryStream(Encoding.UTF8.GetBytes(responseHtml));
+
+                return;
+            }
+
+            var idoc = responseDocuments.FirstOrDefault(d => d.document.DocumentID == documentId);
+            if (idoc != null) {
+                contentStream = new FileStream(idoc.path, FileMode.Open);
+            }
+        }
+
+        /// <summary>
+        ///     Associates the request properties for the specified request.
+        /// </summary>
+        /// <param name="requestId">Values set by user for the model's properties</param>
+        /// <param name="requestProperties">Values of properties associated with the request</param>
+        public void SetRequestProperties(string requestId, IDictionary<string, string> requestProperties) {
+            if (this.requestProperties == null) {
+                this.requestProperties = new Dictionary<string, IDictionary<string, string>>();
+            }
+
+            if (requestProperties == null) {
+                return;
+            }
+
+            if (!this.requestProperties.ContainsKey(requestId)) {
+                this.requestProperties.Add(requestId, requestProperties);
+            } else {
+                this.requestProperties[requestId] = requestProperties;
             }
         }
 
@@ -354,132 +479,109 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Study {
             }
         }
 
-        public void Stop(string requestId, StopReason reason) {
-            log.Debug("ScannerStudyModelProcessor:Statuses: StopRequest=" + requestId + ", reason=" + reason);
-        }
-
         /// <summary>
         ///     Return current status of request.
         /// </summary>
         /// <param name="requestId"></param>
-        /// <returns>
-        ///     RequestStatus denoting the state of the request
-        /// </returns>
+        /// <returns>RequestStatus denoting the state of the request</returns>
         public RequestStatus Status(string requestId) {
             log.Debug("ScannerStudyModelProcessor:Statuses: RequestId=" + requestId);
             return status;
         }
 
         /// <summary>
-        ///     Returns information about the list of PmmlInputDocuments that can be returned.
-        ///     Called when RequestStatus is Complete. Does not return actual contents.
+        ///     Stops a request. Multiple calls may be made and the processor implementation should be able to handle or ignore redundant stop calls.
         /// </summary>
         /// <param name="requestId"></param>
-        /// <returns>
-        ///     List of response PmmlInputDocuments
-        /// </returns>
-        /// <exception cref="ModelProcessorError"></exception>
-        public Document[] Response(string requestId) {
-            log.Debug("ScannerStudyModelProcessor:Response: RequestId=" + requestId);
-            return responseDocuments.Select(idoc => idoc.document).ToArray();
+        /// <param name="reason"></param>
+        public void Stop(string requestId, StopReason reason) {
+            log.Debug("ScannerStudyModelProcessor:Statuses: StopRequest=" + requestId + ", reason=" + reason);
         }
 
         /// <summary>
-        ///     Appends a file to the list of response PmmlInputDocuments.
+        ///     The response documents
         /// </summary>
-        /// <param name="requestId">Request instance id</param>
-        /// <param name="filePath">Local path to the file to attach</param>
-        public void AddResponseDocument(string requestId, string filePath) {
-            log.Debug("ScannerStudyModelProcessor:AddResponseDocument: RequestId=" + requestId + ", filePath=" + filePath);
-
-            try {
-                var document = new Document(Guid.NewGuid().ToString(), GetMimeType(filePath), Path.GetFileName(filePath));
-                var fileInfo = new FileInfo(filePath);
-                responseDocuments.Add(new InternalDocument(document, filePath, fileInfo.Length));
-            } catch (Exception ex) {
-                log.Debug(ex);
-                throw new ModelProcessorError(ex.Message, ex);
-            }
-
-            status.Code = RequestStatus.StatusCode.AwaitingResponseApproval;
-        }
+        private readonly List<InternalDocument> responseDocuments = new List<InternalDocument>();
 
         /// <summary>
-        ///     Removes the response document.
+        ///     The status
         /// </summary>
-        /// <param name="requestId">The request identifier.</param>
-        /// <param name="filePath">The file path.</param>
-        public void RemoveResponseDocument(string requestId, string documentId) {
-            log.Debug("ScannerStudyModelProcessor:RemoveResponseDocument: RequestId=" + requestId + ", documentId=" + documentId);
-
-            try {
-                IList<Document> documents = new List<Document>();
-                foreach (var idoc in responseDocuments) {
-                    if (idoc.document.DocumentID == documentId) {
-                        responseDocuments.Remove(idoc);
-                        break;
-                    }
-                }
-            } catch (Exception ex) {
-                log.Debug(ex);
-                throw new ModelProcessorError(ex.Message, ex);
-            }
-            status.Code = (responseDocuments == null || responseDocuments.Count == 0) ? RequestStatus.StatusCode.Pending : RequestStatus.StatusCode.AwaitingResponseApproval;
-        }
+        private readonly RequestStatus status = new RequestStatus(RequestStatus.StatusCode.Pending);
 
         /// <summary>
-        ///     Gets input stream for the specified Document.
+        ///     The desired documents
         /// </summary>
-        /// <param name="requestId">Request instance idr</param>
-        /// <param name="documentId">The id of the document being transferred</param>
-        /// <param name="contentStream">Stream pointer to a specified Document</param>
-        /// <param name="maxSize">Maximum chunk size (returned chunk may be smaller)</param>
-        public void ResponseDocument(string requestId, string documentId, out Stream contentStream, int maxSize) {
-            log.Debug("ScannerStudyModelProcessor:ResponseDocument: RequestId=" + requestId + ", documentId=" + documentId);
-
-            contentStream = null;
-
-            if (documentId == "0") // response JSON string
-            {
-                contentStream = new MemoryStream(Encoding.UTF8.GetBytes(responseJson));
-
-                return;
-            }
-
-            if (documentId == "1") // response HTML string
-            {
-                contentStream = new MemoryStream(Encoding.UTF8.GetBytes(responseHtml));
-
-                return;
-            }
-
-            var idoc = responseDocuments.FirstOrDefault(d => d.document.DocumentID == documentId);
-            if (idoc != null) {
-                contentStream = new FileStream(idoc.path, FileMode.Open);
-            }
-        }
+        private Document[] desiredDocuments;
 
         /// <summary>
-        ///     Closes the specified request. Local and memory resident data for the request will be cleaned up.
-        ///     Closed request cannot be restarted.
+        ///     The request data mart name
         /// </summary>
-        /// <param name="requestId">Request instance id</param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void Close(string requestId) {
-            log.Debug("ScannerStudyModelProcessor:Close: RequestId=" + requestId);
-        }
+        private string requestDataMartName = "";
 
         /// <summary>
-        ///     Runs the post processor. This method is called by the model processor only if the status returned
-        ///     has a message to be displayed and the user responded "yes".
+        ///     The request json
         /// </summary>
-        /// <param name="requestId"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void PostProcess(string requestId) {
-            log.Debug("ScannerStudyModelProcessor:PostProcess: RequestId=" + requestId);
+        private string requestJson;
+
+        /// <summary>
+        ///     The request type identifier
+        /// </summary>
+        private Guid requestTypeId = Guid.Empty;
+
+        /// <summary>
+        ///     The response HTML
+        /// </summary>
+        private string responseHtml;
+
+        /// <summary>
+        ///     The response json
+        /// </summary>
+        private string responseJson;
+
+        /// <summary>
+        /// </summary>
+        public class InternalDocument {
+
+            #region Constructors
+
+            /// <summary>
+            ///     Initializes a new instance of the <see cref="InternalDocument"/> class.
+            /// </summary>
+            /// <param name="Doc">The document.</param>
+            /// <param name="Path">The path.</param>
+            /// <param name="Size">The size.</param>
+            public InternalDocument(Document Doc, string Path, long Size) {
+                document = Doc;
+                document.Size = Convert.ToInt32(Size);
+                path = Path;
+                size = Size;
+            }
+
+            #endregion Constructors
+
+            #region Properties
+
+            /// <summary>
+            ///     Gets or sets the document.
+            /// </summary>
+            /// <value>The document.</value>
+            public Document document { get; set; }
+
+            /// <summary>
+            ///     Gets or sets the path.
+            /// </summary>
+            /// <value>The path.</value>
+            public string path { get; set; }
+
+            /// <summary>
+            ///     Gets or sets the size.
+            /// </summary>
+            /// <value>The size.</value>
+            public long size { get; set; }
+
+            #endregion Properties
         }
 
-        #endregion
+        #endregion Model Processor Life Cycle Methods
     }
-
 }
