@@ -21,6 +21,7 @@ using Lpp.Scanner.DataMart.Model.Processors.Common.Parameters;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Parameters.Response;
 using Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.Configuration;
 using Newtonsoft.Json;
+using pSCANNER.DataMart.Model.processor.Analysis;
 using pSCANNER.DataMart.Model.processor.Common.Base;
 using System;
 using System.Collections.Generic;
@@ -52,64 +53,6 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
         public ScannerAnalysisModelProcessor(ProxyBase proxy, IModelMetadata metaDataModel) : base(proxy, metaDataModel) { }
 
         #endregion Constructors
-
-        #region ScannerAnalysisModelMetadata
-
-        [Serializable]
-        public class ScannerAnalysisModelMetadata : MetaDataBase {
-
-            #region Constructors
-
-            /// <summary>
-            ///     Initializes a new instance of the <see cref="ScannerAnalysisModelMetadata"/> class.
-            /// </summary>
-            public ScannerAnalysisModelMetadata() : base(new Dictionary<string, bool> { { "IsSingleton", true }, { "RequiresConfig", false }, { "AddFiles", true }, { "CanRunAndUpload", true }, { "CanUploadWithoutRun", true } }, new Dictionary<string, string> { { "ServiceURL", string.Empty }, { Constants.Processor.Input.SettingsEnum.DanURL.ToString(), string.Empty }, { Constants.Processor.Input.SettingsEnum.rLocation.ToString(), string.Empty } }) { }
-
-            #endregion Constructors
-
-            #region Properties
-
-            public override Guid ModelId {
-                get {
-                    return new Guid("977DEE0B-212D-4350-B2D2-E3BFEFCF7672");
-                }
-            }
-
-            /// <summary>
-            ///     Returns the Model Name.
-            /// </summary>
-            public override string ModelName {
-                get {
-                    return "Scanner Analysis";
-                }
-            }
-
-            /// <summary>
-            ///     List of the properties the processor needs.
-            /// </summary>
-            public override ICollection<ProcessorSetting> Settings {
-                get {
-                    var settings = new List<ProcessorSetting> {new ProcessorSetting { // https://jira.mc.vanderbilt.edu/browse/PSCANNER-6
-                        Title = "DAN URL", Key = Constants.Processor.Input.SettingsEnum.DanURL.ToString(), DefaultValue = "http://localhost:22599/DanDirect/DirectBroker/PostRequest", ValueType = typeof(string), Required = true},
-                        new ProcessorSetting { // https://jira.mc.vanderbilt.edu/browse/PSCANNER-6
-                            Title = "R BIN Location ", Key = Constants.Processor.Input.SettingsEnum.rLocation.ToString(), DefaultValue = "C:\\Program Files\\R\\R-3.3.1\\bin\\x64", ValueType = typeof(string), Required = true}};
-                    return settings;
-                }
-            }
-
-            /// <summary>
-            ///     Returns the Model Version.
-            /// </summary>
-            public override string Version {
-                get {
-                    return "0.1";
-                }
-            }
-
-            #endregion Properties
-        }
-
-        #endregion ScannerAnalysisModelMetadata
 
         /// <summary>
         ///     Called repeatedly to provide the Model with the specified document contents.
@@ -155,7 +98,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
         /// </summary>
         /// <param name="parametersJson">The parameters json.</param>
         /// <returns></returns>
-        private static string getDataSetName(string parametersJson) {
+        private static string GetDataSetName(string parametersJson) {
             dynamic parameters = JsonConvert.DeserializeObject(parametersJson);
 
             dynamic item = parameters["DataSetName"];
@@ -177,7 +120,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
         /// </summary>
         /// <param name="parametersJson">The parameters json.</param>
         /// <returns></returns>
-        private static IDictionary<string, Extension> getExtensions(string parametersJson) {
+        private static IDictionary<string, Extension> GetExtensions(string parametersJson) {
             var retVal = new Dictionary<string, Extension>();
 
             dynamic parameters = JsonConvert.DeserializeObject(parametersJson);
@@ -200,7 +143,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
         /// </summary>
         /// <param name="extensions">The parameters json.</param>
         /// <returns></returns>
-        private static bool isIterative(IDictionary<string, Extension> extensions) {
+        private static bool IsIterative(IDictionary<string, Extension> extensions) {
             var retVal = false;
 
             var type = "Type";
@@ -288,7 +231,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
                 var dataSetJson = DatasetJson;
                 var pmmlJson = PmmlJson;
 
-                ResponseJson = getResponse(requestId, parametersJson, dataSetJson, pmmlJson, Settings);
+                ResponseJson = GetResponse(requestId, parametersJson, dataSetJson, pmmlJson, Settings);
 
                 const string responseDocType = "xml";
                 var document = new Document("0", string.Format("application/{0}", responseDocType), string.Format("response.{0}", responseDocType)) { IsViewable = false, Size = ResponseJson.Length };
@@ -316,16 +259,16 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
         /// <param name="pmmlJson">The PMML json.</param>
         /// <param name="settings">The settings.</param>
         /// <returns></returns>
-        private string getResponse(string requestId, string parametersJson, string dataSetJson, string pmmlJson, IDictionary<string, object> settings) {
-            var extensions = getExtensions(parametersJson);
-            var dataSetName = getDataSetName(dataSetJson);
+        private string GetResponse(string requestId, string parametersJson, string dataSetJson, string pmmlJson, IDictionary<string, object> settings) {
+            var extensions = GetExtensions(parametersJson);
+            var dataSetName = GetDataSetName(dataSetJson);
             var connection = DataSetConnection.Get(dataSetName);
-            var iterative = isIterative(extensions);
+            var iterative = IsIterative(extensions);
 
             BaseProxyRequestParameter requestParameter;
 
             if (iterative) {
-                initializeParameters(dataSetJson, ref parametersJson);
+                InitializeParameters(dataSetJson, ref parametersJson);
                 var rLocation = settings.GetAsString(Constants.Processor.Input.SettingsEnum.rLocation.ToString(), string.Empty);
                 requestParameter = new AggregatorClientRequestParameter(requestId, dataSetJson, parametersJson, pmmlJson, connection, rLocation);
             } else {
@@ -346,7 +289,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
             return responseJson;
         }
 
-        private void initializeParameters(string dataDictionaryJson, ref string parametersJson) {
+        private void InitializeParameters(string dataDictionaryJson, ref string parametersJson) {
             if (parametersJson.Contains("PMML.GeneralRegressionModel.Coefficients") == false) {
                 dynamic deserializeObject = JsonConvert.DeserializeObject(dataDictionaryJson);
                 dynamic parametersObject = JsonConvert.DeserializeObject(parametersJson);

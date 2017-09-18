@@ -20,6 +20,7 @@ using Lpp.Scanner.DataMart.Model.Processors.Common.Models;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Parameters;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Processor.Task;
 using Newtonsoft.Json;
+using pSCANNER.DataMart.Model.processor.Aggregation;
 using pSCANNER.DataMart.Model.processor.Common.Base;
 using System;
 using System.Collections.Generic;
@@ -53,7 +54,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         /// </summary>
         /// <param name="proxy">The proxy.</param>
         /// <param name="metaDataModel">The meta data model.</param>
-        protected ScannerAnalysisModelAggregator(ProxyBase proxy, IModelMetadata metaDataModel) : base(proxy, metaDataModel) {
+        public ScannerAnalysisModelAggregator(ProxyBase proxy, IModelMetadata metaDataModel) : base(proxy, metaDataModel) {
             PmmlInputDocs = new List<string>();
         }
 
@@ -118,67 +119,6 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         protected override void request() {
             PmmlInputDocs = new List<string>();
         }
-
-        #region ScannerAggregationModelMetadata
-
-        /// <summary>
-        /// </summary>
-        /// <seealso cref="Lpp.Scanner.DataMart.Model.Processors.Common.Base.MetaDataBase"/>
-        [Serializable]
-        internal class ScannerAggregationModelMetadata : MetaDataBase {
-
-            #region Constructors
-
-            /// <summary>
-            ///     Initializes a new instance of the <see cref="ScannerAggregationModelMetadata"/> class.
-            /// </summary>
-            public ScannerAggregationModelMetadata() : base(new Dictionary<string, bool> { { "IsSingleton", true }, { "RequiresConfig", false }, { "AddFiles", true }, { "CanRunAndUpload", true }, { "CanUploadWithoutRun", true } }, new Dictionary<string, string> { { "ServiceURL", string.Empty }, { Constants.Aggregator.Input.SettingsEnum.rLocation.ToString(), string.Empty } }) { }
-
-            #endregion Constructors
-
-            #region Properties
-
-            /// <summary>
-            ///     Returns the Model Id.
-            /// </summary>
-            public override Guid ModelId {
-                get {
-                    return Guid.Parse("1AF2DB2F-8F66-4123-8886-81D08B9A3685");
-                }
-            }
-
-            /// <summary>
-            ///     Returns the Model Name.
-            /// </summary>
-            public override string ModelName {
-                get {
-                    return "Scanner Aggregation";
-                }
-            }
-
-            /// <summary>
-            ///     List of the properties the processor needs.
-            /// </summary>
-            public override ICollection<ProcessorSetting> Settings {
-                get {
-                    var settings = new List<ProcessorSetting> { new ProcessorSetting { Title = "R Location", Key = Constants.Aggregator.Input.SettingsEnum.rLocation.ToString(), DefaultValue = "C:\\Program Files\\R\\R-3.3.1\\bin\\x64", ValueType = typeof(string), Required = true } };
-                    return settings;
-                }
-            }
-
-            /// <summary>
-            ///     Returns the Model Version.
-            /// </summary>
-            public override string Version {
-                get {
-                    return "0.1";
-                }
-            }
-
-            #endregion Properties
-        }
-
-        #endregion ScannerAggregationModelMetadata
 
         /// <summary>
         ///     Adds the document.
