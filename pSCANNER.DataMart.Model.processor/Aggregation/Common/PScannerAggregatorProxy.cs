@@ -84,7 +84,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
             try {
                 var parameter = (AggregatorServerRequestParameter)requestParameter;
 
-                var dataFields = getDataFields(parameter.SiteResponses);
+                var dataFields = GetDataFields(parameter.SiteResponses);
 
                 var siteResponses = new SiteResponse[parameter.SiteResponses.Count];
 
@@ -94,15 +94,15 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
                     index++;
                 }
 
-                var pCovMatrixPerSite = getPCovMatrixPerSite(siteResponses);
+                var pCovMatrixPerSite = GetPCovMatrixPerSite(siteResponses);
 
-                var errorGradientPerSite = getErrorGradientPerSite(siteResponses);
+                var errorGradientPerSite = GetErrorGradientPerSite(siteResponses);
 
-                var beta0 = getBeta0(parameter.ParametersJson);
+                var beta0 = GetBeta0(parameter.ParametersJson);
 
-                var maxAggregationCount = getMaxAggregationCount(parameter.ParametersJson);
+                var maxAggregationCount = GetMaxAggregationCount(parameter.ParametersJson);
                 var paramsJson = parameter.ParametersJson;
-                var aggregationCount = getAggregationCount(ref paramsJson);
+                var aggregationCount = GetAggregationCount(ref paramsJson);
                 parameter.ParametersJson = paramsJson;
                 var rScript = RScriptWriter.GenerateRScript(pCovMatrixPerSite, errorGradientPerSite, beta0, dataFields, aggregationCount, maxAggregationCount);
 
@@ -113,7 +113,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
                 if (task != null) {
                     task.WasRequestedAgain();
                 } else {
-                    task = (TTask)Activator.CreateInstance(typeof(TTask), rRequest, new RAdapter(convertToParametersJson, parameter, parameter.ParametersJson));
+                    task = (TTask)Activator.CreateInstance(typeof(TTask), rRequest, new RAdapter(ConvertToParametersJson, parameter, parameter.ParametersJson));
                     Tasks.Add(parameter.RequestId, task);
                     task.Start();
                 }
@@ -168,7 +168,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         /// <param name="parameter">The parameter.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        private static string convertToParametersJson(string response, BaseRequestParameter parameter, object[] parameters) {
+        private static string ConvertToParametersJson(string response, BaseRequestParameter parameter, object[] parameters) {
             var features = RScriptBuilder.GetResponse(response, "FeatureList");
 
             var featureMatches = ScriptConstants._featureListRegularExpression.Matches(features);
@@ -207,8 +207,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
 
             jobj[ScriptConstants.IterationTypeConst] = doIterate ? ScriptConstants.IterationConst : ScriptConstants.StopIterationConst;
 
-            int aggregationCycleCount;
-            if (int.TryParse((jobj[string.Format("{0}.{1}", VariableConstants.PMML_Header_Extension, VariableConstants.AggregationCycleCountConst)] ?? string.Empty).ToString(), out aggregationCycleCount) == false) {
+            if (int.TryParse((jobj[string.Format("{0}.{1}", VariableConstants.PMML_Header_Extension, VariableConstants.AggregationCycleCountConst)] ?? string.Empty).ToString(), out int aggregationCycleCount) == false) {
                 aggregationCycleCount = 0;
             }
 
@@ -228,7 +227,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         /// </summary>
         /// <param name="parametersJson">The parameters json.</param>
         /// <returns></returns>
-        private static Coefficients getBeta0(string parametersJson) {
+        private static Coefficients GetBeta0(string parametersJson) {
             var coefficients = new Coefficients();
 
             var regexObj = new Regex(string.Format(@"((?nix)""PMML.GeneralRegressionModel.Coefficients.(?<{0}>(?<{1}>[^""]+)""\s*:\s*""(?<{2}>\-?\d*(\.\d*)?)(?="")))", pair, name, value), RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -248,7 +247,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
 
             if (matchResults.Success) {
                 var targetValue = matchResults.Groups["target"].Value;
-                coefficients.setTarget(targetValue);
+                coefficients.SetTarget(targetValue);
             }
 
             return coefficients;
@@ -259,7 +258,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         /// </summary>
         /// <param name="parametersJson">The parameters json.</param>
         /// <returns></returns>
-        private int getAggregationCount(ref string parametersJson) {
+        private int GetAggregationCount(ref string parametersJson) {
             dynamic paramsObject = JsonConvert.DeserializeObject(parametersJson);
             var tag = string.Format("{0}.{1}", VariableConstants.PMML_Header_Extension, VariableConstants.AggregationCycleCountConst);
             var aggrCountNode = paramsObject[tag];
@@ -275,7 +274,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         /// </summary>
         /// <param name="siteResponses">The site responses.</param>
         /// <returns></returns>
-        private IEnumerable<string> getDataFields(IEnumerable<string> siteResponses) {
+        private IEnumerable<string> GetDataFields(IEnumerable<string> siteResponses) {
             var dataDictionaries = siteResponses.Select(entry => new DataDictionaryEntry(entry)).ToList();
 
             return dataDictionaries.First().DataFields.Select(x => x.Name).ToList();
@@ -286,7 +285,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         /// </summary>
         /// <param name="siteResponses">The site responses.</param>
         /// <returns></returns>
-        private IDictionary<string, ErrorGradientModel> getErrorGradientPerSite(IEnumerable<SiteResponse> siteResponses) {
+        private IDictionary<string, ErrorGradientModel> GetErrorGradientPerSite(IEnumerable<SiteResponse> siteResponses) {
             var errorGradients = siteResponses.Select(x => new ErrorGradientModel(x)).ToList();
             return errorGradients.ToDictionary(x => x.SiteName, x => x);
         }
@@ -296,7 +295,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         /// </summary>
         /// <param name="parametersJson">The parameters json.</param>
         /// <returns></returns>
-        private int getMaxAggregationCount(string parametersJson) {
+        private int GetMaxAggregationCount(string parametersJson) {
             var max = 20;
 
             var pattern = string.Format(@"((?nix)""PMML.Header.Extension.{0}""\s*:\s*""(?<{1}>\d+)?"")", VariableConstants.MaxIterationsConst, value);
@@ -313,7 +312,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         /// </summary>
         /// <param name="pmmlCovarianceMatrices">The PMML covariance matrices.</param>
         /// <returns></returns>
-        private IDictionary<string, PCovMatrix> getPCovMatrixPerSite(IEnumerable<SiteResponse> pmmlCovarianceMatrices) {
+        private IDictionary<string, PCovMatrix> GetPCovMatrixPerSite(IEnumerable<SiteResponse> pmmlCovarianceMatrices) {
             var pCovMatrices = pmmlCovarianceMatrices.Select(x => new PCovMatrix(x)).ToList();
 
             return pCovMatrices.ToDictionary(x => x.SiteName, x => x);

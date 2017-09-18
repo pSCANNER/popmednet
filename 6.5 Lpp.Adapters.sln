@@ -76,6 +76,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pScanner", "pScanner", "{1D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lpp.Dns.DTO.Scanner", "Lpp.Dns.DTO.Scanner\Lpp.Dns.DTO.Scanner.csproj", "{E46B9B37-5144-4EB6-BFC1-85CDFCCBB6E1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Lpp.pScanner.DataMart.Model.Processors", "Test.Lpp.pScanner.DataMart.Model.Processors\Test.Lpp.pScanner.DataMart.Model.Processors.csproj", "{B6028521-F085-4BEB-B93B-43A882420A3B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Adapters|Any CPU = Adapters|Any CPU
@@ -227,6 +229,12 @@ Global
 		{E46B9B37-5144-4EB6-BFC1-85CDFCCBB6E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E46B9B37-5144-4EB6-BFC1-85CDFCCBB6E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E46B9B37-5144-4EB6-BFC1-85CDFCCBB6E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6028521-F085-4BEB-B93B-43A882420A3B}.Adapters|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6028521-F085-4BEB-B93B-43A882420A3B}.Adapters|Any CPU.Build.0 = Debug|Any CPU
+		{B6028521-F085-4BEB-B93B-43A882420A3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6028521-F085-4BEB-B93B-43A882420A3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6028521-F085-4BEB-B93B-43A882420A3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6028521-F085-4BEB-B93B-43A882420A3B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -239,6 +247,7 @@ Global
 		{2456D187-A88B-4DEF-ABC8-B30CFF1A0387} = {9A75954B-0820-4A47-AF8B-5ED59495FB10}
 		{B5A7864F-AA68-4022-9E85-766CAFD3A4D5} = {1DF3DCFC-2C1A-487E-85D1-393E41644524}
 		{E46B9B37-5144-4EB6-BFC1-85CDFCCBB6E1} = {1DF3DCFC-2C1A-487E-85D1-393E41644524}
+		{B6028521-F085-4BEB-B93B-43A882420A3B} = {1DF3DCFC-2C1A-487E-85D1-393E41644524}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {29B1B1CA-E1B9-4433-B9FA-67FAF088DECF}

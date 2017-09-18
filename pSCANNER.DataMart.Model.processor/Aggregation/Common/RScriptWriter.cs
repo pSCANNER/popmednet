@@ -42,7 +42,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
             rScriptBuilder.AddLine(string.Format("{0} <- {1}", ScriptConstants.AggregationCountConst, aggregationCount));
             rScriptBuilder.AddLine(string.Format("{0} <- {1}", ScriptConstants.MaxAggrCountConst, maxAggregationCount));
 
-            setFeatureNumber(rScriptBuilder, numberFeatures);
+            SetFeatureNumber(rScriptBuilder, numberFeatures);
 
             rScriptBuilder.AddLine("{0} <- {1}", ScriptConstants._epsilon.ToString(), ScriptConstants._epsilon.DefaultValue);
 
@@ -52,17 +52,17 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
 
             rScriptBuilder.AddLine("{0} <- {1}", ScriptConstants._siteCount.ToString(), pCovMatricesPerSite.Count.ToString());
 
-            initCovarianceMatrix(rScriptBuilder, pCovMatricesPerSite);
+            InitCovarianceMatrix(rScriptBuilder, pCovMatricesPerSite);
 
-            initGradientError(rScriptBuilder, errorGradientPerSite);
+            InitGradientError(rScriptBuilder, errorGradientPerSite);
 
             //initKServer(scriptBuilder);
 
-            initSdTrue(rScriptBuilder);
+            InitSdTrue(rScriptBuilder);
 
-            calculateNewCoefficients(rScriptBuilder);
+            CalculateNewCoefficients(rScriptBuilder);
 
-            writeOutFeatures(rScriptBuilder, features, dataFields);
+            WriteOutFeatures(rScriptBuilder, features, dataFields);
 
             return rScriptBuilder.Text;
         }
@@ -71,7 +71,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         ///     Calculates the new coefficients.
         /// </summary>
         /// <param name="scriptBuilder">The script builder.</param>
-        private static void calculateNewCoefficients(RScriptBuilder scriptBuilder) {
+        private static void CalculateNewCoefficients(RScriptBuilder scriptBuilder) {
             scriptBuilder.AddLine("     {1} <- {0} + solve(rowSums({2}, dims=2) + diag({5}, {3})) %*% (rowSums({4}, dims=2))", ScriptConstants._beta0, ScriptConstants._beta1, ScriptConstants._deviationMatrix, ScriptConstants._columnCount, ScriptConstants._errorMatrix, ScriptConstants._columnCount.DefaultValue);
             scriptBuilder.AddLine("     if(({3} >= {4}) || mean(abs({1} - {0})) < {2})", ScriptConstants._beta0, ScriptConstants._beta1, ScriptConstants._epsilon, ScriptConstants.AggregationCountConst, ScriptConstants.MaxAggrCountConst);
             scriptBuilder.AddLine("     {");
@@ -90,7 +90,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         /// <param name="scriptBuilder">The script builder.</param>
         /// <param name="pCovMatricesPerSite">The p cov matrices per site.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        private static void initCovarianceMatrix(BaseScriptBuilder scriptBuilder, IDictionary<string, PCovMatrix> pCovMatricesPerSite) {
+        private static void InitCovarianceMatrix(BaseScriptBuilder scriptBuilder, IDictionary<string, PCovMatrix> pCovMatricesPerSite) {
             scriptBuilder.AddLine("{0} <- array({1}, c({2}, {2}, {3}))", ScriptConstants._deviationMatrix.ToString(), ScriptConstants._deviationMatrix.DefaultValue, ScriptConstants._columnCount.ToString(), ScriptConstants._siteCount.ToString());
 
             //BaseError
@@ -140,7 +140,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         /// <param name="scriptBuilder">The script builder.</param>
         /// <param name="errorGradientPerSite">The error gradient per site.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        private static void initGradientError(BaseScriptBuilder scriptBuilder, IDictionary<string, ErrorGradientModel> errorGradientPerSite) {
+        private static void InitGradientError(BaseScriptBuilder scriptBuilder, IDictionary<string, ErrorGradientModel> errorGradientPerSite) {
             scriptBuilder.AddLine("{0} <- array({1}, c({2}, 1, {3}))", ScriptConstants._errorMatrix.ToString(), ScriptConstants._errorMatrix.DefaultValue, ScriptConstants._columnCount.ToString(), ScriptConstants._siteCount.ToString());
 
             var siteMap = new Dictionary<string, Dictionary<string, string>>();
@@ -172,7 +172,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         /// </summary>
         /// <param name="scriptBuilder">The script builder.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        private static void initSdTrue(BaseScriptBuilder scriptBuilder) {
+        private static void InitSdTrue(BaseScriptBuilder scriptBuilder) {
             scriptBuilder.AddLine("{0} <- 0", ScriptConstants._standardDeviation.ToString());
         }
 
@@ -182,7 +182,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         /// <param name="scriptBuilder">The script builder.</param>
         /// <param name="numberFeatures">The number features.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        private static void setFeatureNumber(BaseScriptBuilder scriptBuilder, int numberFeatures) {
+        private static void SetFeatureNumber(BaseScriptBuilder scriptBuilder, int numberFeatures) {
             scriptBuilder.AddLine("{1} <- {0}", numberFeatures.ToString(), ScriptConstants._columnCount.ToString());
         }
 
@@ -192,7 +192,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         /// <param name="scriptBuilder">The script builder.</param>
         /// <param name="features">The features.</param>
         /// <param name="dataFields">The data fields.</param>
-        private static void writeOutFeatures(RScriptBuilder scriptBuilder, string[] features, IEnumerable<string> dataFields) {
+        private static void WriteOutFeatures(RScriptBuilder scriptBuilder, string[] features, IEnumerable<string> dataFields) {
             IEqualityComparer<string> comparer = new StringListComparer();
             var enumerable = features.Select(x => x.DropPrefix("x")).ToList();
             var intersect = enumerable.Intersect(dataFields, comparer).ToList();

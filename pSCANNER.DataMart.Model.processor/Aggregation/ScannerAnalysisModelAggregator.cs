@@ -85,7 +85,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
                         var docText = reader.ReadToEnd();
                         ParametersJson = docText;
                     } else {
-                        assignPmmlInputDocuments(reader);
+                        AssignPmmlInputDocuments(reader);
                     }
                 }
             } catch (Exception ex) {
@@ -187,7 +187,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         /// <param name="fileType">Type of the file.</param>
         /// <param name="responseType">Type of the response.</param>
         /// <param name="finalResponse">The final response.</param>
-        private void addDocument(string documentId, string fileType, string responseType, string finalResponse) {
+        private void AddDocument(string documentId, string fileType, string responseType, string finalResponse) {
             var mimeType = string.Format("application/{0}", fileType);
             var filename = string.Format("{0}.{1}", responseType.ToLower(), fileType);
             var document = new Document(documentId, mimeType, filename) { IsViewable = false, Size = finalResponse.Length };
@@ -199,17 +199,17 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         ///     Asses the response documents.
         /// </summary>
         /// <param name="requestParameter">The request parameter.</param>
-        private void addResponseDocuments(BaseRequestParameter requestParameter) {
+        private void AddResponseDocuments(BaseRequestParameter requestParameter) {
             var response = (AggregatorResponse)Proxy.GetResponse(requestParameter);
 
-            addDocument("0", "json", "Parameters", response.FinalResponse);
+            AddDocument("0", "json", "Parameters", response.FinalResponse);
         }
 
         /// <summary>
         ///     Assigns the PMML input documents.
         /// </summary>
         /// <param name="reader">The reader.</param>
-        private void assignPmmlInputDocuments(TextReader reader) {
+        private void AssignPmmlInputDocuments(TextReader reader) {
             var docs = reader.ReadToEnd();
 
             var matchCollection = _pmmlCapture.Matches(docs);
@@ -289,7 +289,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
                 var pmmlInputDocs = PmmlInputDocs;
                 var parametersJson = ParametersJson;
 
-                initializeParameters(ref parametersJson);
+                InitializeParameters(ref parametersJson);
                 var siteNames = DesiredDocuments.Select(x => x.Filename).Select(x => x.Split('.')[0]).ToArray();
 
                 var requestParameter = new AggregatorServerRequestParameter(requestId, rLocationPath, pmmlInputDocs, parametersJson, siteNames);
@@ -312,7 +312,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
                     if (responseBase.Status != Constants.ResponseStatus.InProgress) {
                         ResponseJsonPath = string.Format("{0}{1}.json", Path.GetTempPath(), Guid.NewGuid());
 
-                        addResponseDocuments(requestParameter);
+                        AddResponseDocuments(requestParameter);
 
                         // Set completion status
                         RequestStatus.Code = RequestStatus.StatusCode.Complete;
@@ -341,7 +341,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         ///     Initializes the parameters.
         /// </summary>
         /// <param name="parametersJson">The parameters json.</param>
-        private void initializeParameters(ref string parametersJson) {
+        private void InitializeParameters(ref string parametersJson) {
             if (parametersJson.Contains("PMML.GeneralRegressionModel.Coefficients") == false) {
                 dynamic parametersObject = JsonConvert.DeserializeObject(parametersJson);
 

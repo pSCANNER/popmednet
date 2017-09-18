@@ -52,7 +52,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common {
         ///     Sets the target.
         /// </summary>
         /// <param name="targetValue">The target value.</param>
-        public void setTarget(string targetValue) {
+        public void SetTarget(string targetValue) {
             TargetValue = targetValue;
         }
     }
