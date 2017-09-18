@@ -10,8 +10,6 @@
 
 #endregion Legal Information
 
-#region Using
-
 using Lpp.Dns.DataMart.Model;
 using Lpp.Dns.DataMart.Model.Settings;
 using Lpp.Scanner.DataMart.Model.Processors.Analysis.Common;
@@ -29,30 +27,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-#endregion Using
-
 namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
 
+    /// <summary>
+    /// </summary>
+    /// <seealso cref="Lpp.Scanner.DataMart.Model.Processors.Common.Base.ScannerBase"/>
     [Serializable]
     public class ScannerAnalysisModelProcessor : ScannerBase {
-
-        #region Setup
-
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ScannerAnalysisModelProcessor"/> class.
-        /// </summary>
-        public ScannerAnalysisModelProcessor() : this(new PScannerProcessorProxy(), new ScannerAnalysisModelMetadata()) { }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ScannerAnalysisModelProcessor"/> class.
-        /// </summary>
-        /// <param name="proxy">The proxy.</param>
-        /// <param name="metaDataModel">The meta data model.</param>
-        public ScannerAnalysisModelProcessor(ProxyBase proxy, IModelMetadata metaDataModel) : base(proxy, metaDataModel) { }
-
-        #endregion Constructors
 
         /// <summary>
         ///     Called repeatedly to provide the Model with the specified document contents.
@@ -81,116 +62,6 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
                 throw;
             }
         }
-
-        /// <summary>
-        ///     Gets the processor identifier.
-        /// </summary>
-        /// <returns></returns>
-        protected override string GetProcessorId() {
-            return "9B30325D-1863-4A1F-A2B3-5C58B52D3CE0";
-        }
-
-        protected override void request() {
-        }
-
-        /// <summary>
-        ///     Gets the name of the data set.
-        /// </summary>
-        /// <param name="parametersJson">The parameters json.</param>
-        /// <returns></returns>
-        private static string GetDataSetName(string parametersJson) {
-            dynamic parameters = JsonConvert.DeserializeObject(parametersJson);
-
-            dynamic item = parameters["DataSetName"];
-            if (item == null) {
-                throw new NullReferenceException("DataSetName");
-            }
-
-            string retVal = item.ToString();
-
-            if (retVal == string.Empty) {
-                throw new NullReferenceException("DataSetName");
-            }
-
-            return retVal;
-        }
-
-        /// <summary>
-        ///     Gets the extensions.
-        /// </summary>
-        /// <param name="parametersJson">The parameters json.</param>
-        /// <returns></returns>
-        private static IDictionary<string, Extension> GetExtensions(string parametersJson) {
-            var retVal = new Dictionary<string, Extension>();
-
-            dynamic parameters = JsonConvert.DeserializeObject(parametersJson);
-            foreach (var extension in parameters) {
-                Extension ext = null;
-                if (extension.ToString().Contains("PMML.Header.Extension")) {
-                    var name = ((string)extension.Name).Split('.').Last();
-                    ext = new Extension(name, ((string)extension.Value));
-                }
-                if (ext != null) {
-                    retVal.Add(ext.Name, ext);
-                }
-            }
-
-            return retVal;
-        }
-
-        /// <summary>
-        ///     Determines whether the specified parameters json is iterative.
-        /// </summary>
-        /// <param name="extensions">The parameters json.</param>
-        /// <returns></returns>
-        private static bool IsIterative(IDictionary<string, Extension> extensions) {
-            var retVal = false;
-
-            var type = "Type";
-            if (extensions.ContainsKey(type)) {
-                var extension = extensions[type];
-                retVal = extension.Value.Equals("iteration", StringComparison.InvariantCultureIgnoreCase);
-            }
-
-            return retVal;
-        }
-
-        public class Extension {
-
-            #region Constructors
-
-            /// <summary>
-            ///     Initializes a new instance of the <see cref="Extension"/> class.
-            /// </summary>
-            /// <param name="name">The name.</param>
-            /// <param name="value">The value.</param>
-            public Extension(string name, string value) {
-                Name = name;
-                Value = value;
-            }
-
-            #endregion Constructors
-
-            #region Properties
-
-            /// <summary>
-            ///     Gets the name.
-            /// </summary>
-            /// <value>The name.</value>
-            public string Name { get; private set; }
-
-            /// <summary>
-            ///     Gets the value.
-            /// </summary>
-            /// <value>The value.</value>
-            public string Value { get; private set; }
-
-            #endregion Properties
-        }
-
-        #endregion Setup
-
-        #region Model Processor Life Cycle Methods
 
         /// <summary>
         ///     Gets input stream for the specified Document.
@@ -251,6 +122,83 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
         }
 
         /// <summary>
+        ///     Gets the processor identifier.
+        /// </summary>
+        /// <returns></returns>
+        protected override string GetProcessorId() {
+            return "9B30325D-1863-4A1F-A2B3-5C58B52D3CE0";
+        }
+
+        /// <summary>
+        ///     Requests this instance.
+        /// </summary>
+        protected override void request() {
+        }
+
+        /// <summary>
+        ///     Gets the name of the data set.
+        /// </summary>
+        /// <param name="parametersJson">The parameters json.</param>
+        /// <returns></returns>
+        /// <exception cref="System.NullReferenceException">DataSetName or DataSetName</exception>
+        private static string GetDataSetName(string parametersJson) {
+            dynamic parameters = JsonConvert.DeserializeObject(parametersJson);
+
+            dynamic item = parameters["DataSetName"];
+            if (item == null) {
+                throw new NullReferenceException("DataSetName");
+            }
+
+            string retVal = item.ToString();
+
+            if (retVal == string.Empty) {
+                throw new NullReferenceException("DataSetName");
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
+        ///     Gets the extensions.
+        /// </summary>
+        /// <param name="parametersJson">The parameters json.</param>
+        /// <returns></returns>
+        private static IDictionary<string, Extension> GetExtensions(string parametersJson) {
+            var retVal = new Dictionary<string, Extension>();
+
+            dynamic parameters = JsonConvert.DeserializeObject(parametersJson);
+            foreach (var extension in parameters) {
+                Extension ext = null;
+                if (extension.ToString().Contains("PMML.Header.Extension")) {
+                    var name = ((string)extension.Name).Split('.').Last();
+                    ext = new Extension(name, ((string)extension.Value));
+                }
+                if (ext != null) {
+                    retVal.Add(ext.Name, ext);
+                }
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
+        ///     Determines whether the specified parameters json is iterative.
+        /// </summary>
+        /// <param name="extensions">The parameters json.</param>
+        /// <returns><c>true</c> if the specified extensions is iterative; otherwise, <c>false</c>.</returns>
+        private static bool IsIterative(IDictionary<string, Extension> extensions) {
+            var retVal = false;
+
+            var type = "Type";
+            if (extensions.ContainsKey(type)) {
+                var extension = extensions[type];
+                retVal = extension.Value.Equals("iteration", StringComparison.InvariantCultureIgnoreCase);
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
         ///     Gets the response.
         /// </summary>
         /// <param name="requestId">The request identifier.</param>
@@ -289,6 +237,11 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
             return responseJson;
         }
 
+        /// <summary>
+        ///     Initializes the parameters.
+        /// </summary>
+        /// <param name="dataDictionaryJson">The data dictionary json.</param>
+        /// <param name="parametersJson">The parameters json.</param>
         private void InitializeParameters(string dataDictionaryJson, ref string parametersJson) {
             if (parametersJson.Contains("PMML.GeneralRegressionModel.Coefficients") == false) {
                 dynamic deserializeObject = JsonConvert.DeserializeObject(dataDictionaryJson);
@@ -312,6 +265,16 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
             }
         }
 
-        #endregion Model Processor Life Cycle Methods
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ScannerAnalysisModelProcessor"/> class.
+        /// </summary>
+        public ScannerAnalysisModelProcessor() : this(new PScannerProcessorProxy(), new ScannerAnalysisModelMetadata()) { }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ScannerAnalysisModelProcessor"/> class.
+        /// </summary>
+        /// <param name="proxy">The proxy.</param>
+        /// <param name="metaDataModel">The meta data model.</param>
+        public ScannerAnalysisModelProcessor(ProxyBase proxy, IModelMetadata metaDataModel) : base(proxy, metaDataModel) { }
     }
 }

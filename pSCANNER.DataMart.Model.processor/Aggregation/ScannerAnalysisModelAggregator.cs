@@ -40,36 +40,6 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
     [Serializable]
     public class ScannerAnalysisModelAggregator : ScannerBase {
 
-        #region Setup
-
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ScannerAnalysisModelAggregator"/> class.
-        /// </summary>
-        public ScannerAnalysisModelAggregator() : this(new PScannerAggregatorProxy<AsyncTask>(), new ScannerAggregationModelMetadata()) { }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ScannerAnalysisModelAggregator"/> class.
-        /// </summary>
-        /// <param name="proxy">The proxy.</param>
-        /// <param name="metaDataModel">The meta data model.</param>
-        public ScannerAnalysisModelAggregator(ProxyBase proxy, IModelMetadata metaDataModel) : base(proxy, metaDataModel) {
-            PmmlInputDocs = new List<string>();
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
-        /// <summary>
-        ///     Gets the PMML input docs.
-        /// </summary>
-        /// <value>The PMML input docs.</value>
-        private IList<string> PmmlInputDocs { get; set; }
-
-        #endregion Properties
-
         /// <summary>
         ///     Called repeatedly to provide the Model with the specified document contents.
         /// </summary>
@@ -94,6 +64,112 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
                 RequestStatus.Code = RequestStatus.StatusCode.Error;
                 RequestStatus.Message = ex.Message;
                 throw;
+            }
+        }
+
+        /// <summary>
+        ///     Gets input stream for the specified Document.
+        /// </summary>
+        /// <param name="requestId">Request instance idr</param>
+        /// <param name="documentId">The id of the document being transferred</param>
+        /// <param name="contentStream">Stream pointer to a specified Document</param>
+        /// <param name="maxSize">Maximum chunk size (returned chunk may be smaller)</param>
+        public override void ResponseDocument(string requestId, string documentId, out Stream contentStream, int maxSize) {
+            Log.Debug(string.Format("ScannerStudyModelProcessor:ResponseDocument: RequestId={0}, documentId={1}", requestId, documentId));
+
+            contentStream = null;
+
+            if (documentId == "0") // response JSON string
+            {
+                contentStream = new MemoryStream(Encoding.UTF8.GetBytes(ResponseJson));
+
+                return;
+            }
+
+            var idoc = ResponseDocuments.FirstOrDefault(d => d.Document.DocumentID == documentId);
+            if (idoc != null) {
+                contentStream = new FileStream(idoc.Path, FileMode.Open);
+            }
+        }
+
+        //        {
+        //  "PMML.Header.Extension.Type": "Iteration",
+        //  "PMML.Header.Extension.DataSetName": null,
+        //  "PMML.Header.Extension.DataSetSchemaVersion": "1.0",
+        //  "PMML.GeneralRegressionModel.modelName": "General_Regression_Model",
+        //  "PMML.GeneralRegressionModel.linkFunction": "identity",
+        //  "PMML.GeneralRegressionModel.MiningSchema.MiningField.target": "work",
+        //  "PMML.GeneralRegressionModel.MiningSchema.MiningField.active": [
+        //    "minority",
+        //    "jobcat",
+        //    "sex",
+        //    "age"
+        //  ],
+        //  "PMML.Header.Extension.MaxIterations": "5"
+        //}
+        /// <summary>
+        ///     Starts the specified request identifier.
+        /// </summary>
+        /// <param name="requestId">The request identifier.</param>
+        /// <param name="viewSql">if set to <c>true</c> [view SQL].</param>
+        /// <exception cref="ModelProcessorError">
+        ///     Error in response - new Exception("Error in response") or Error in response - new Exception("Error in response") or
+        /// </exception>
+        /// <exception cref="Exception">Error in response or Error in response</exception>
+        public override void Start(string requestId, bool viewSql = false) {
+            Log.Debug(string.Format("ScannerAnalysisModelAggregator.Start(RequestId={0}, viewSQL={1}{2}", requestId, viewSql, ')'));
+
+            try {
+                var rLocationPath = Settings.GetAsString(Constants.Aggregator.Input.SettingsEnum.rLocation.ToString(), "");
+
+                var pmmlInputDocs = PmmlInputDocs;
+                var parametersJson = ParametersJson;
+
+                InitializeParameters(ref parametersJson);
+                var siteNames = DesiredDocuments.Select(x => x.Filename).Select(x => x.Split('.')[0]).ToArray();
+
+                var requestParameter = new AggregatorServerRequestParameter(requestId, rLocationPath, pmmlInputDocs, parametersJson, siteNames);
+
+                var responseBase = Proxy.PostRequest(requestParameter);
+
+                if (responseBase.Status != Constants.ResponseStatus.Error) {
+                    if (responseBase == null) {
+                        throw new ModelProcessorError("Error in response", new Exception("Error in response"));
+                    }
+
+                    RequestStatus.Code = RequestStatus.StatusCode.InProgress;
+
+                    while (responseBase.Status == Constants.ResponseStatus.InProgress || responseBase.Status == Constants.ResponseStatus.Undefined) {
+                        Thread.Sleep(1000);
+                        responseBase = Proxy.GetStatus(requestParameter);
+                    }
+
+                    // this should cycle through and load up the document information as well as actual response JSON
+                    if (responseBase.Status != Constants.ResponseStatus.InProgress) {
+                        ResponseJsonPath = string.Format("{0}{1}.json", Path.GetTempPath(), Guid.NewGuid());
+
+                        AddResponseDocuments(requestParameter);
+
+                        // Set completion status
+                        RequestStatus.Code = RequestStatus.StatusCode.Complete;
+                        RequestStatus.Message = string.Empty;
+                    } else {
+                        // I need to figure out the best error response here
+                        throw new ModelProcessorError("Error in response", new Exception("Error in response"));
+                    }
+                } else {
+                    Status(requestId).Code = RequestStatus.StatusCode.Error;
+                }
+            } catch (Exception ex) {
+                Log.Debug(ex);
+
+                //while (Statuses(requestId).Code == RequestStatus.StatusCode.InProgress) {
+                //    Thread.Sleep(10000);
+                //}
+
+                if (Status(requestId).Code == RequestStatus.StatusCode.Error) {
+                    throw new ModelProcessorError(ex.Message, ex);
+                }
             }
         }
 
@@ -162,122 +238,6 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         }
 
         /// <summary>
-        ///     The PMML capture
-        /// </summary>
-        private static readonly Regex _pmmlCapture = new Regex(@"<\?xml[\s\w="".-]+\?>.+?</PMML>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
-
-        #endregion Setup
-
-        #region Model Processor Life Cycle Methods
-
-        //        {
-        //  "PMML.Header.Extension.Type": "Iteration",
-        //  "PMML.Header.Extension.DataSetName": null,
-        //  "PMML.Header.Extension.DataSetSchemaVersion": "1.0",
-        //  "PMML.GeneralRegressionModel.modelName": "General_Regression_Model",
-        //  "PMML.GeneralRegressionModel.linkFunction": "identity",
-        //  "PMML.GeneralRegressionModel.MiningSchema.MiningField.target": "work",
-        //  "PMML.GeneralRegressionModel.MiningSchema.MiningField.active": [
-        //    "minority",
-        //    "jobcat",
-        //    "sex",
-        //    "age"
-        //  ],
-        //  "PMML.Header.Extension.MaxIterations": "5"
-        //}
-
-        /// <summary>
-        ///     Gets input stream for the specified Document.
-        /// </summary>
-        /// <param name="requestId">Request instance idr</param>
-        /// <param name="documentId">The id of the document being transferred</param>
-        /// <param name="contentStream">Stream pointer to a specified Document</param>
-        /// <param name="maxSize">Maximum chunk size (returned chunk may be smaller)</param>
-        public override void ResponseDocument(string requestId, string documentId, out Stream contentStream, int maxSize) {
-            Log.Debug(string.Format("ScannerStudyModelProcessor:ResponseDocument: RequestId={0}, documentId={1}", requestId, documentId));
-
-            contentStream = null;
-
-            if (documentId == "0") // response JSON string
-            {
-                contentStream = new MemoryStream(Encoding.UTF8.GetBytes(ResponseJson));
-
-                return;
-            }
-
-            var idoc = ResponseDocuments.FirstOrDefault(d => d.Document.DocumentID == documentId);
-            if (idoc != null) {
-                contentStream = new FileStream(idoc.Path, FileMode.Open);
-            }
-        }
-
-        /// <summary>
-        ///     Starts the specified request identifier.
-        /// </summary>
-        /// <param name="requestId">The request identifier.</param>
-        /// <param name="viewSql">if set to <c>true</c> [view SQL].</param>
-        /// <exception cref="ModelProcessorError">
-        ///     Error in response - new Exception("Error in response") or Error in response - new Exception("Error in response") or
-        /// </exception>
-        /// <exception cref="Exception">Error in response or Error in response</exception>
-        public override void Start(string requestId, bool viewSql = false) {
-            Log.Debug(string.Format("ScannerAnalysisModelAggregator.Start(RequestId={0}, viewSQL={1}{2}", requestId, viewSql, ')'));
-
-            try {
-                var rLocationPath = Settings.GetAsString(Constants.Aggregator.Input.SettingsEnum.rLocation.ToString(), "");
-
-                var pmmlInputDocs = PmmlInputDocs;
-                var parametersJson = ParametersJson;
-
-                InitializeParameters(ref parametersJson);
-                var siteNames = DesiredDocuments.Select(x => x.Filename).Select(x => x.Split('.')[0]).ToArray();
-
-                var requestParameter = new AggregatorServerRequestParameter(requestId, rLocationPath, pmmlInputDocs, parametersJson, siteNames);
-
-                var responseBase = Proxy.PostRequest(requestParameter);
-
-                if (responseBase.Status != Constants.ResponseStatus.Error) {
-                    if (responseBase == null) {
-                        throw new ModelProcessorError("Error in response", new Exception("Error in response"));
-                    }
-
-                    RequestStatus.Code = RequestStatus.StatusCode.InProgress;
-
-                    while (responseBase.Status == Constants.ResponseStatus.InProgress || responseBase.Status == Constants.ResponseStatus.Undefined) {
-                        Thread.Sleep(1000);
-                        responseBase = Proxy.GetStatus(requestParameter);
-                    }
-
-                    // this should cycle through and load up the document information as well as actual response JSON
-                    if (responseBase.Status != Constants.ResponseStatus.InProgress) {
-                        ResponseJsonPath = string.Format("{0}{1}.json", Path.GetTempPath(), Guid.NewGuid());
-
-                        AddResponseDocuments(requestParameter);
-
-                        // Set completion status
-                        RequestStatus.Code = RequestStatus.StatusCode.Complete;
-                        RequestStatus.Message = string.Empty;
-                    } else {
-                        // I need to figure out the best error response here
-                        throw new ModelProcessorError("Error in response", new Exception("Error in response"));
-                    }
-                } else {
-                    Status(requestId).Code = RequestStatus.StatusCode.Error;
-                }
-            } catch (Exception ex) {
-                Log.Debug(ex);
-
-                //while (Statuses(requestId).Code == RequestStatus.StatusCode.InProgress) {
-                //    Thread.Sleep(10000);
-                //}
-
-                if (Status(requestId).Code == RequestStatus.StatusCode.Error) {
-                    throw new ModelProcessorError(ex.Message, ex);
-                }
-            }
-        }
-
-        /// <summary>
         ///     Initializes the parameters.
         /// </summary>
         /// <param name="parametersJson">The parameters json.</param>
@@ -312,6 +272,29 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Aggregation {
         /// <value>The response json path.</value>
         public string ResponseJsonPath { get; set; }
 
-        #endregion Model Processor Life Cycle Methods
+        /// <summary>
+        ///     Gets the PMML input docs.
+        /// </summary>
+        /// <value>The PMML input docs.</value>
+        private IList<string> PmmlInputDocs { get; set; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ScannerAnalysisModelAggregator"/> class.
+        /// </summary>
+        public ScannerAnalysisModelAggregator() : this(new PScannerAggregatorProxy<AsyncTask>(), new ScannerAggregationModelMetadata()) { }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ScannerAnalysisModelAggregator"/> class.
+        /// </summary>
+        /// <param name="proxy">The proxy.</param>
+        /// <param name="metaDataModel">The meta data model.</param>
+        public ScannerAnalysisModelAggregator(ProxyBase proxy, IModelMetadata metaDataModel) : base(proxy, metaDataModel) {
+            PmmlInputDocs = new List<string>();
+        }
+
+        /// <summary>
+        ///     The PMML capture
+        /// </summary>
+        private static readonly Regex _pmmlCapture = new Regex(@"<\?xml[\s\w="".-]+\?>.+?</PMML>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
     }
 }
