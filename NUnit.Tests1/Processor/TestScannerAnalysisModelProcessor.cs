@@ -2,12 +2,7 @@
 using Lpp.Scanner.DataMart.Model.Processors.Common.Processor.Task;
 using NUnit.Framework;
 using pSCANNER.DataMart.Model.processor.Analysis;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Test.Lpp.pScanner.DataMart.Model.Processors.Processor {
 
