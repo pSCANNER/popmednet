@@ -47,6 +47,7 @@
     <Compile Include="Aggregator\TestScannerAnalysisModelAggregator.cs" />
     <Compile Include="Processor\MockScannerAnalysisModelProcessor.cs" />
     <Compile Include="Processor\TestScannerAnalysisModelProcessor.cs" />
+    <Compile Include="Processor\TestScannerAnalysisModelProcessorBase.cs" />
     <Compile Include="TestClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

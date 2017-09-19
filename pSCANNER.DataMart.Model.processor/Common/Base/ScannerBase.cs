@@ -26,6 +26,9 @@ using System.Reflection;
 
 namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
 
+    /// <summary>
+    /// </summary>
+    /// <seealso cref="Lpp.Dns.DataMart.Model.IModelProcessor"/>
     public abstract class ScannerBase : IModelProcessor {
 
         /// <summary>
@@ -33,6 +36,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         /// </summary>
         /// <param name="requestId">Request instance id</param>
         /// <param name="filePath">Local path to the file to attach</param>
+        /// <exception cref="ModelProcessorError"></exception>
         public void AddResponseDocument(string requestId, string filePath) {
             _log.Debug("ScannerAnalysisModelAggregator.AddResponseDocument(RequestId=" + requestId + ", filePath=" + filePath + ')');
 
@@ -100,6 +104,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         /// <param name="requestDocuments">The request documents.</param>
         /// <param name="requestProperties">The request properties.</param>
         /// <param name="desiredDocuments">The desired documents.</param>
+        /// <exception cref="System.ArgumentException">RequestId or NetworkConnectionMetadata or Document[] or RequestMetadata</exception>
         /// <exception cref="ModelProcessorError"></exception>
         public void Request(string requestId
                                     , NetworkConnectionMetadata network
@@ -266,6 +271,9 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         /// <returns></returns>
         protected abstract string GetProcessorId();
 
+        /// <summary>
+        ///     Requests this instance.
+        /// </summary>
         protected abstract void request();
 
         /// <summary>
@@ -389,6 +397,9 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
             _modelMetadata = metaDataModel;
         }
 
+        /// <summary>
+        ///     The HTML template
+        /// </summary>
         protected const string HtmlTemplate = @"<html>
           <body style=""font-family: Calibri; font-size: font-size: 16px;"">
             <table style=""border-style:solid; border-width: 2px; width: 620px; margin:4px; padding:4px"">
@@ -409,11 +420,34 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
           </body>
         </html>";
 
+        /// <summary>
+        ///     The log
+        /// </summary>
         private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        /// <summary>
+        ///     The model metadata
+        /// </summary>
         private readonly IModelMetadata _modelMetadata;
+
+        /// <summary>
+        ///     The request status
+        /// </summary>
         private readonly RequestStatus _requestStatus = new RequestStatus();
+
+        /// <summary>
+        ///     The response documents
+        /// </summary>
         private readonly List<InternalDocument> _responseDocuments = new List<InternalDocument>();
+
+        /// <summary>
+        ///     The request properties
+        /// </summary>
         private IDictionary<string, IDictionary<string, string>> _requestProperties; // Key: requestId, Value: Request Properties
+
+        /// <summary>
+        ///     The request statuses
+        /// </summary>
         private IDictionary<string, RequestStatus> _requestStatuses = new Dictionary<string, RequestStatus>();
     }
 }
