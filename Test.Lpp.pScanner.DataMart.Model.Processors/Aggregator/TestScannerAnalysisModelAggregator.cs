@@ -37,9 +37,8 @@ namespace Test.Lpp.pScanner.DataMart.Model.Processors {
         public void TestResponseDocument() {
             string requestId = null;
             string documentId = null;
-            Stream contentStream = null;
             int maxSize = 0;
-            _aggregator.ResponseDocument(requestId, documentId, out contentStream, maxSize);
+            _aggregator.ResponseDocument(requestId, documentId, out Stream contentStream, maxSize);
         }
 
         /// <summary>
