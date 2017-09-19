@@ -1,0 +1,65 @@
+ {
+     "name": "GeneralRegressionModel",
+     "parameters": [
+         {
+             "id": "PMML.Header.Extension.Type",
+             "label": "",
+             "type": "string",
+             "control": "hidden",
+             "values": ["Iteration"]
+         },
+         {
+             "id": "PMML.Header.Extension.DataSetName",
+             "label": "",
+             "type": "string",
+             "control": "hidden",
+             "values": []
+         },
+         {
+             "id": "PMML.Header.Extension.DataSetSchemaVersion",
+             "label": "",
+             "type": "string",
+             "control": "hidden",
+             "values": ["1.0"]
+         },
+         {
+             "id": "PMML.GeneralRegressionModel.modelName",
+             "label": "",
+             "type": "string",
+             "control": "hidden",
+             "values": ["General_Regression_Model"]
+         },
+         {
+             "id": "PMML.GeneralRegressionModel.linkFunction",
+             "label": "Family",
+             "type": "string",
+             "control": "dropdown",
+             "required": true,
+             "availableValues": ["gaussian (linear regression)", "binomial (logit)", "poisson"],
+             "values": ["gaussian()", "binomial(), poisson()]
+         },
+         {
+             "id": "PMML.GeneralRegressionModel.MiningSchema.MiningField.target",
+             "label": "Predicted",
+             "type": "string",
+             "control": "PMML.DataDictionary.Single",
+             "required": false,
+             "values": []
+         },
+         {
+             "id": "PMML.GeneralRegressionModel.MiningSchema.MiningField.active",
+             "label": "Active",
+             "type": "stringArray",
+             "control": "PMML.DataDictionary.Multi",
+             "required": true,
+             "values": []
+         },
+         {
+             "id": "PMML.Header.Extension.MaxIterations",
+             "label": "Maximum Iterations",
+             "type": "string",
+             "control": "hidden",
+             "values": ["5"]
+         }
+     ]
+ }

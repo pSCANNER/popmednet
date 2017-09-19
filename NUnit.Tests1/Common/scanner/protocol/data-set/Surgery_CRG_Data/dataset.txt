@@ -1,0 +1,47 @@
+{"DataSetName": "Surgery_CRG_Data",
+  "DataDictionary": {
+    "numberOfFields": "8",
+    "DataField": [
+      {
+        "name": "outcome",
+        "optype": "dichotomous",
+        "dataType": "dichotomous"
+      },
+      {
+        "name": "id",
+        "optype": "continuous",
+        "dataType": "double"
+      },
+      {
+        "name": "start",
+        "optype": "continuous",
+        "dataType": "double"
+      },
+      {
+        "name": "stop",
+        "optype": "continuous",
+        "dataType": "double"
+      },
+      {
+        "name": "transplant",
+        "optype": "continuous",
+        "dataType": "double"
+      },
+      {
+        "name": "age",
+        "optype": "continuous",
+        "dataType": "double"
+      },
+      {
+        "name": "year",
+        "optype": "continuous",
+        "dataType": "double"
+      },
+      {
+        "name": "surgery",
+        "optype": "continuous",
+        "dataType": "double"
+      }
+    ]
+  }
+}

@@ -68,8 +68,39 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Common\" />
+    <Content Include="Common\scanner\datasets - Copy.txt" />
+    <Content Include="Common\scanner\datasets.txt" />
+    <Content Include="Common\scanner\library-methods-dm-changes.txt" />
+    <Content Include="Common\scanner\library-methods.txt" />
+    <Content Include="Common\scanner\protocol\data-set\Cancer_CRG_Data\dataset.txt" />
+    <Content Include="Common\scanner\protocol\data-set\data-quality\dataset.txt" />
+    <Content Include="Common\scanner\protocol\data-set\i2b2\dataset.txt" />
+    <Content Include="Common\scanner\protocol\data-set\LungData\dataset.txt" />
+    <Content Include="Common\scanner\protocol\data-set\mte\dataset.txt" />
+    <Content Include="Common\scanner\protocol\data-set\obesity\dataset.txt" />
+    <Content Include="Common\scanner\protocol\data-set\omop-cdm\dataset.txt" />
+    <Content Include="Common\scanner\protocol\data-set\pcornet-cdm\dataset.txt" />
+    <Content Include="Common\scanner\protocol\data-set\Surgery_CRG_Data\dataset.txt" />
+    <Content Include="Common\scanner\protocol\ecqm-diabetes\parameters-ui.txt" />
+    <Content Include="Common\scanner\protocol\ecqm-diabetes\pmml.txt" />
+    <Content Include="Common\scanner\protocol\ecqm-hypertension\parameters-ui.txt" />
+    <Content Include="Common\scanner\protocol\ecqm-hypertension\pmml.txt" />
+    <Content Include="Common\scanner\protocol\general-regression\parameters-ui.txt" />
+    <Content Include="Common\scanner\protocol\general-regression\pmml.txt" />
+    <Content Include="Common\scanner\protocol\glore-logistic-regression\parameters-ui-dm-modify.txt" />
+    <Content Include="Common\scanner\protocol\glore-logistic-regression\parameters-ui.txt" />
+    <Content Include="Common\scanner\protocol\glore-logistic-regression\pmml.txt" />
+    <Content Include="Common\scanner\protocol\oceans-linear-regression\parameters-ui.txt" />
+    <Content Include="Common\scanner\protocol\oceans-linear-regression\pmml.txt" />
+    <Content Include="Common\scanner\protocol\oceans-logistical-regression\parameters-ui.txt" />
+    <Content Include="Common\scanner\protocol\oceans-logistical-regression\pmml.txt" />
+    <Content Include="Common\scanner\protocol\ohdsi-achilles\parameters-ui.txt" />
+    <Content Include="Common\scanner\protocol\ohdsi-achilles\pmml.txt" />
+    <Content Include="Common\scanner\protocol\translation-omop2\parameters-ui.txt" />
+    <Content Include="Common\scanner\protocol\translation-omop2\pmml.txt" />
+    <Content Include="Common\scanner\result-release-names.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

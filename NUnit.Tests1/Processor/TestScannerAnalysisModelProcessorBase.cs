@@ -28,9 +28,9 @@ namespace NUnit.Lpp.pScanner.DataMart.Model.Processors.Processor {
                 RequestTypeId = Guid.Empty.ToString()
             };
             _requestDocuments = new Document[] {
-                new Document("1", "json", "file1"),
-                new Document("2", "json", "file2"),
-                new Document("3", "json", "file3")
+                new Document("1", "json", "dataset.json"),
+                new Document("2", "json", "parameters.json"),
+                new Document("3", "json", "pmml.json")
             };
         }
 
@@ -63,17 +63,6 @@ namespace NUnit.Lpp.pScanner.DataMart.Model.Processors.Processor {
         }
 
         /// <summary>
-        ///     Tests this instance.
-        /// </summary>
-        //[Test]
-        public void RequestDocument_Test() {
-            string requestId = It.IsAny<String>();
-            string documentId = It.IsAny<String>();
-            var contentStream = new Mock<Stream>();
-            _processor.RequestDocument(requestId, documentId, contentStream.Object);
-        }
-
-        /// <summary>
         ///     Tests the response document.
         /// </summary>
         //[Test]
@@ -91,6 +80,8 @@ namespace NUnit.Lpp.pScanner.DataMart.Model.Processors.Processor {
         public void TearDown() {
             _processor = null;
         }
+
+        protected const string RequestId = "1";
 
         /// <summary>
         ///     The network

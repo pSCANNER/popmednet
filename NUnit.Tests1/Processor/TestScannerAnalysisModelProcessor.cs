@@ -4,6 +4,7 @@ using NUnit.Framework;
 using NUnit.Lpp.pScanner.DataMart.Model.Processors.Processor;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Test.Lpp.pScanner.DataMart.Model.Processors.Processor {
 
@@ -17,8 +18,8 @@ namespace Test.Lpp.pScanner.DataMart.Model.Processors.Processor {
         /// </summary>
         //[Test]
         public void Request_Documents_Empty_Test() {
-            Assert.That(() => _processor.Request("1", _network, _requestMetadata, null, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("Document[]"));
-            Assert.That(() => _processor.Request("1", _network, _requestMetadata, new Document[] { }, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("Document[]"));
+            Assert.That(() => _processor.Request(RequestId, _network, _requestMetadata, null, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("Document[]"));
+            Assert.That(() => _processor.Request(RequestId, _network, _requestMetadata, new Document[] { }, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("Document[]"));
         }
 
         /// <summary>
@@ -26,7 +27,7 @@ namespace Test.Lpp.pScanner.DataMart.Model.Processors.Processor {
         /// </summary>
         //[Test]
         public void Request_NetworkConnectionMetadata_Empty_Test() {
-            Assert.That(() => _processor.Request("1", null, _requestMetadata, _requestDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("NetworkConnectionMetadata"));
+            Assert.That(() => _processor.Request(RequestId, null, _requestMetadata, _requestDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("NetworkConnectionMetadata"));
         }
 
         /// <summary>
@@ -44,7 +45,7 @@ namespace Test.Lpp.pScanner.DataMart.Model.Processors.Processor {
         /// </summary>
         //[Test]
         public void Request_RequestMetadata_Empty_Test() {
-            Assert.That(() => _processor.Request("1", _network, null, _requestDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("RequestMetadata"));
+            Assert.That(() => _processor.Request(RequestId, _network, null, _requestDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("RequestMetadata"));
         }
 
         /// <summary>
@@ -52,8 +53,17 @@ namespace Test.Lpp.pScanner.DataMart.Model.Processors.Processor {
         /// </summary>
         //[Test]
         public void Request_Test() {
-            string requestId = It.IsAny<String>();
-            _processor.Request("1", _network, _requestMetadata, _requestDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments);
+            _processor.Request(RequestId, _network, _requestMetadata, _requestDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments);
+        }
+
+        [Test]
+        public void RequestDocument_Test() {
+            _processor.Request(RequestId, _network, _requestMetadata, _requestDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments);
+
+            string requestId = RequestId;
+            string documentId = "1";
+            var contentStream = new Mock<Stream>();
+            _processor.RequestDocument(requestId, documentId, contentStream.Object);
         }
     }
 }

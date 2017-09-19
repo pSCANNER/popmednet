@@ -1,0 +1,36 @@
+[{
+	"LibraryName": "Oceans Lib",
+	"MethodName": "Logistic Regression",
+	"Description": "Oceans - Logistical Regression",
+	"LibraryMethodURL": "scanner/protocol/oceans-logistical-regression/"
+}, {
+	"LibraryName": "Oceans Lib",
+	"MethodName": "Linear Regression",
+	"Description": "Oceans - Linear Regression",
+	"LibraryMethodURL": "scanner/protocol/oceans-linear-regression/"
+}, {
+	"LibraryName": "Map-Reduce",
+	"MethodName": "Map-Reduce GLM",
+	"Description": "Map-Reduce Generalized Linear Models",
+	"LibraryMethodURL": "scanner/protocol/glore-logistic-regression/"
+}, {
+	"LibraryName": "eCQM",
+	"MethodName": "Hypertension",
+	"Description": "eCQM - Hypertension",
+	"LibraryMethodURL": "scanner/protocol/ecqm-hypertension/"
+}, {
+	"LibraryName": "eCQM",
+	"MethodName": "Diabetes",
+	"Description": "eCQM - Diabetes",
+	"LibraryMethodURL": "scanner/protocol/ecqm-diabetes/"
+}, {
+	"LibraryName": "OHDSI",
+	"MethodName": "Achilles",
+	"Description": "OHDSI - Achilles",
+	"LibraryMethodURL": "scanner/protocol/ohdsi-achilles/"
+}, {
+	"LibraryName": "Translation",
+	"MethodName": "OMOP2",
+	"Description": "Translation - OMOP2",
+	"LibraryMethodURL": "scanner/protocol/translation-omop2/"
+}]
