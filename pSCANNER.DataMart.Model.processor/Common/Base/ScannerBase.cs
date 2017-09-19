@@ -120,12 +120,12 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
                 throw new ArgumentException("NetworkConnectionMetadata");
             }
 
-            if (requestDocuments == null || requestDocuments.Count() == 0) {
-                throw new ArgumentException("Document[]");
-            }
-
             if (md == null) {
                 throw new ArgumentException("RequestMetadata");
+            }
+
+            if (requestDocuments == null || requestDocuments.Count() == 0) {
+                throw new ArgumentException("Document[]");
             }
 
             _log.Debug("ScannerAnalysisModelAggregator.Request(RequestId=" + requestId + "...) documentCount=" + (requestDocuments == null ? 0 : requestDocuments.Length));

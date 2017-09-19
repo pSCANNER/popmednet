@@ -25,8 +25,13 @@ namespace NUnit.Lpp.pScanner.DataMart.Model.Processors.Processor {
                 UserLogin = ""
             };
             _requestMetadata = new RequestMetadata {
+                RequestTypeId = Guid.Empty.ToString()
             };
-            _requestDocuments = new Document[] { };
+            _requestDocuments = new Document[] {
+                new Document("1", "json", "file1"),
+                new Document("2", "json", "file2"),
+                new Document("3", "json", "file3")
+            };
         }
 
         //[Test]
