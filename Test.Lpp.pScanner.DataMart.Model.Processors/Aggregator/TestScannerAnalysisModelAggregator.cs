@@ -8,13 +8,13 @@ namespace Test.Lpp.pScanner.DataMart.Model.Processors {
 
     /// <summary>
     /// </summary>
-    [TestClass]
+    //[TestClass]
     public class TestScannerAnalysisModelAggregator {
 
         /// <summary>
         ///     Initializes the test.
         /// </summary>
-        [TestInitialize]
+        //[TestInitialize]
         public void InitializeTest() {
             _aggregator = new ScannerAnalysisModelAggregator(new MockPScannerAggregatorProxy<AsyncTask>(), new ScannerAggregationModelMetadata());
         }
@@ -22,7 +22,7 @@ namespace Test.Lpp.pScanner.DataMart.Model.Processors {
         /// <summary>
         ///     Tests the request document.
         /// </summary>
-        [TestMethod]
+        //[TestMethod]
         public void TestRequestDocument() {
             string requestId = null;
             string documentId = null;
@@ -33,7 +33,7 @@ namespace Test.Lpp.pScanner.DataMart.Model.Processors {
         /// <summary>
         ///     Tests the response document.
         /// </summary>
-        [TestMethod]
+        //[TestMethod]
         public void TestResponseDocument() {
             string requestId = null;
             string documentId = null;
