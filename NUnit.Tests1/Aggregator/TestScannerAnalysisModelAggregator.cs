@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Test.Lpp.pScanner.DataMart.Model.Processors.Aggregator {
 
-    [TestFixture]
+    //[TestFixture]
     public class TestScannerAnalysisModelAggregator {
 
         /// <summary>

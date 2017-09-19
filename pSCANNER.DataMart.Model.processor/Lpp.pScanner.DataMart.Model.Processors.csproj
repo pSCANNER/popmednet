@@ -80,6 +80,7 @@
     <Compile Include="Aggregation\Common\ScriptConstants.cs" />
     <Compile Include="Aggregation\Common\SiteResponse.cs" />
     <Compile Include="Aggregation\Common\VariableEntry.cs" />
+    <Compile Include="Analysis\Common\Helper.cs" />
     <Compile Include="Analysis\Common\LocalConstants.cs" />
     <Compile Include="Analysis\Common\MiningFields.cs" />
     <Compile Include="Analysis\Common\ProcessorResponse.cs" />

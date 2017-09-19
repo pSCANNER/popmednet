@@ -20,6 +20,7 @@ using Lpp.Scanner.DataMart.Model.Processors.Common.Parameters.Response;
 using Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.Configuration;
 using Newtonsoft.Json;
 using pSCANNER.DataMart.Model.processor.Analysis;
+using pSCANNER.DataMart.Model.processor.Analysis.Common;
 using pSCANNER.DataMart.Model.processor.Common.Base;
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,18 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
         /// <param name="documentId">The id of the Document being transferred</param>
         /// <param name="contentStream">Stream pointer to read the document</param>
         public override void RequestDocument(string requestId, string documentId, Stream contentStream) {
+            if (requestId.IsEmpty()) {
+                throw new ArgumentNullException("requestId");
+            }
+
+            if (documentId.IsEmpty()) {
+                throw new ArgumentNullException("documentId");
+            }
+
+            if (contentStream == null) {
+                throw new ArgumentNullException("contentStream");
+            }
+
             Log.Debug(string.Format("ScannerAnalysisModelProcessor.RequestDocument(RequestId={0}, documentId={1}", requestId, documentId));
 
             try {

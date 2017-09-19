@@ -2,10 +2,9 @@
 
 // ====================================================================================
 //
-//      Center for Population Health Informatics
-//      Solution: Lpp.Adapters
-//      Project: Lpp.Scanner.DataMart.Model.Processors
-//      Last Updated By: Westerman, Dax Marek
+// Center for Population Health Informatics
+// Solution: Lpp.Adapters
+// Project: Lpp.Scanner.DataMart.Model.Processors Last Updated By: Westerman, Dax Marek
 //
 // ====================================================================================
 
@@ -50,8 +49,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         }
 
         /// <summary>
-        ///     Closes the specified request. Local and memory resident data for the request will be cleaned up.
-        ///     Closed request cannot be restarted.
+        ///     Closes the specified request. Local and memory resident data for the request will be cleaned up. Closed request cannot be restarted.
         /// </summary>
         /// <param name="requestId">Request instance id</param>
         /// <exception cref="NotImplementedException"></exception>
@@ -60,8 +58,8 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         }
 
         /// <summary>
-        ///     Runs the post processor. This method is called by the model processor only if the status returned
-        ///     has a message to be displayed and the user responded "yes".
+        ///     Runs the post processor. This method is called by the model processor only if the status returned has a message to be displayed and the user
+        ///     responded "yes".
         /// </summary>
         /// <param name="requestId"></param>
         /// <exception cref="NotImplementedException"></exception>
@@ -93,12 +91,38 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
             _requestStatus.Code = (_responseDocuments == null || _responseDocuments.Count == 0) ? RequestStatus.StatusCode.Pending : RequestStatus.StatusCode.AwaitingResponseApproval;
         }
 
+        /// <summary>
+        ///     Requests the specified request identifier.
+        /// </summary>
+        /// <param name="requestId">The request identifier.</param>
+        /// <param name="network">The network.</param>
+        /// <param name="md">The md.</param>
+        /// <param name="requestDocuments">The request documents.</param>
+        /// <param name="requestProperties">The request properties.</param>
+        /// <param name="desiredDocuments">The desired documents.</param>
+        /// <exception cref="ModelProcessorError"></exception>
         public void Request(string requestId
                                     , NetworkConnectionMetadata network
                                     , RequestMetadata md
                                     , Document[] requestDocuments
                                     , out IDictionary<string, string> requestProperties
                                     , out Document[] desiredDocuments) {
+            if (string.IsNullOrEmpty(requestId) || string.IsNullOrWhiteSpace(requestId)) {
+                throw new ArgumentException("RequestId");
+            }
+
+            if (network == null) {
+                throw new ArgumentException("NetworkConnectionMetadata");
+            }
+
+            if (requestDocuments == null || requestDocuments.Count() == 0) {
+                throw new ArgumentException("Document[]");
+            }
+
+            if (md == null) {
+                throw new ArgumentException("RequestMetadata");
+            }
+
             _log.Debug("ScannerAnalysisModelAggregator.Request(RequestId=" + requestId + "...) documentCount=" + (requestDocuments == null ? 0 : requestDocuments.Length));
 
             try {
@@ -126,13 +150,10 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         public abstract void RequestDocument(string requestId, string documentId, Stream contentStream);
 
         /// <summary>
-        ///     Returns information about the list of PmmlInputDocuments that can be returned.
-        ///     Called when RequestStatus is Complete. Does not return actual contents.
+        ///     Returns information about the list of PmmlInputDocuments that can be returned. Called when RequestStatus is Complete. Does not return actual contents.
         /// </summary>
         /// <param name="requestId"></param>
-        /// <returns>
-        ///     List of response PmmlInputDocuments
-        /// </returns>
+        /// <returns>List of response PmmlInputDocuments</returns>
         /// <exception cref="ModelProcessorError"></exception>
         public Document[] Response(string requestId) {
             _log.Debug("ScannerAnalysisModelAggregator.Response(RequestId=" + requestId + ')');
@@ -170,9 +191,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         }
 
         /// <summary>
-        ///     Corresponds to IModelProcessor's Start method.
-        ///     Tells the web service that all request Documents are transferred
-        ///     and that it may begin processing.
+        ///     Corresponds to IModelProcessor's Start method. Tells the web service that all request Documents are transferred and that it may begin processing.
         /// </summary>
         /// <param name="requestId">Identifies this request for subsequent calls</param>
         /// <param name="viewSql">Denotes the generated SQL should be returned as a result</param>
@@ -182,17 +201,14 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         ///     Return current status of request.
         /// </summary>
         /// <param name="requestId"></param>
-        /// <returns>
-        ///     RequestStatus denoting the state of the request
-        /// </returns>
+        /// <returns>RequestStatus denoting the state of the request</returns>
         public RequestStatus Status(string requestId) {
             _log.Debug("ScannerAnalysisModelAggregator.Statuses(RequestId=" + requestId + ')');
             return _requestStatus;
         }
 
         /// <summary>
-        ///     Stops a request. Multiple calls may be made and the processor implementation should be able
-        ///     to handle or ignore redundant stop calls.
+        ///     Stops a request. Multiple calls may be made and the processor implementation should be able to handle or ignore redundant stop calls.
         /// </summary>
         /// <param name="requestId"></param>
         /// <param name="reason"></param>
@@ -212,8 +228,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         }
 
         /// <summary>
-        ///     Stops a request. Multiple calls may be made and the processor implementation should be able
-        ///     to handle or ignore redundant StopConst calls.
+        ///     Stops a request. Multiple calls may be made and the processor implementation should be able to handle or ignore redundant StopConst calls.
         /// </summary>
         /// <param name="requestParameter">The request parameter.</param>
         /// <exception cref="ModelProcessorError"></exception>
@@ -256,9 +271,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         /// <summary>
         ///     Gets the model metadata.
         /// </summary>
-        /// <value>
-        ///     The model metadata.
-        /// </value>
+        /// <value>The model metadata.</value>
         public IModelMetadata ModelMetadata {
             get {
                 return _modelMetadata;
@@ -268,9 +281,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         /// <summary>
         ///     Gets the model processor identifier.
         /// </summary>
-        /// <value>
-        ///     The model processor identifier.
-        /// </value>
+        /// <value>The model processor identifier.</value>
         public Guid ModelProcessorId {
             get {
                 return Guid.Parse(GetProcessorId());
@@ -280,17 +291,13 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         /// <summary>
         ///     Gets or sets the settings.
         /// </summary>
-        /// <value>
-        ///     The settings.
-        /// </value>
+        /// <value>The settings.</value>
         public IDictionary<string, object> Settings { get; set; }
 
         /// <summary>
         ///     Gets the log.
         /// </summary>
-        /// <value>
-        ///     The log.
-        /// </value>
+        /// <value>The log.</value>
         protected static ILog Log {
             get {
                 return _log;
@@ -300,49 +307,37 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         /// <summary>
         ///     Gets or sets the dataset json.
         /// </summary>
-        /// <value>
-        ///     The dataset json.
-        /// </value>
+        /// <value>The dataset json.</value>
         protected string DatasetJson { get; set; }
 
         /// <summary>
         ///     Gets or sets the desired documents.
         /// </summary>
-        /// <value>
-        ///     The desired documents.
-        /// </value>
+        /// <value>The desired documents.</value>
         protected Document[] DesiredDocuments { get; set; }
 
         /// <summary>
         ///     Gets or sets the parameters json.
         /// </summary>
-        /// <value>
-        ///     The parameters json.
-        /// </value>
+        /// <value>The parameters json.</value>
         protected string ParametersJson { get; set; }
 
         /// <summary>
         ///     Gets or sets the PMML json.
         /// </summary>
-        /// <value>
-        ///     The PMML json.
-        /// </value>
+        /// <value>The PMML json.</value>
         protected string PmmlJson { get; set; }
 
         /// <summary>
         ///     Gets the proxy.
         /// </summary>
-        /// <value>
-        ///     The proxy.
-        /// </value>
+        /// <value>The proxy.</value>
         protected ProxyBase Proxy { get; private set; }
 
         /// <summary>
         ///     Gets the request status.
         /// </summary>
-        /// <value>
-        ///     The request status.
-        /// </value>
+        /// <value>The request status.</value>
         protected RequestStatus RequestStatus {
             get {
                 return _requestStatus;
@@ -352,9 +347,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         /// <summary>
         ///     Gets or sets the request statuses.
         /// </summary>
-        /// <value>
-        ///     The request statuses.
-        /// </value>
+        /// <value>The request statuses.</value>
         protected IDictionary<string, RequestStatus> RequestStatuses {
             get {
                 return _requestStatuses;
@@ -367,17 +360,13 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         /// <summary>
         ///     Gets or sets the request type identifier.
         /// </summary>
-        /// <value>
-        ///     The request type identifier.
-        /// </value>
+        /// <value>The request type identifier.</value>
         protected Guid RequestTypeId { get; set; }
 
         /// <summary>
         ///     Gets the response documents.
         /// </summary>
-        /// <value>
-        ///     The response documents.
-        /// </value>
+        /// <value>The response documents.</value>
         protected List<InternalDocument> ResponseDocuments {
             get {
                 return _responseDocuments;
@@ -387,13 +376,11 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         /// <summary>
         ///     Gets or sets the response json.
         /// </summary>
-        /// <value>
-        ///     The response json.
-        /// </value>
+        /// <value>The response json.</value>
         protected string ResponseJson { get; set; }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="ScannerBase" /> class.
+        ///     Initializes a new instance of the <see cref="ScannerBase"/> class.
         /// </summary>
         /// <param name="proxy">The proxy.</param>
         /// <param name="metaDataModel">The meta data model.</param>
