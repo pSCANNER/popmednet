@@ -1,68 +1,47 @@
-#region Legal Information
+﻿using System;
 
-// ====================================================================================
-//  
-//      Center for Population Health Informatics
-//      Solution: Lpp.Adapters
-//      Project: Lpp.Scanner.DataMart.Model.Processors
-//      Last Updated By: Westerman, Dax Marek
-// 
-// ====================================================================================
+//<DataSetConnectionSection>
+//    <DataSetConnections>
+//      <add Name="Example" ConnectionType="HTTP" DataType="CSV" Uri="http://www.ats.ucla.edu/stat/data/binary.csv" />
+//      <add Name="Test" ConnectionType="Database" DataType="MSSQL" Uri="Server=DAX-PC;Database=pScannerDataSources;User Id=myUsername;Password=myPassword;" Version="1.0" />
+//      <add Name="MTE" ConnectionType="Database" DataType="MSSQL" Uri="Server=NLDMIWUA51323FX\\DEVELOPMENT;Database=pScannerDataSources;Trusted_Connection=True;" Version="1.0"/>
+//    </DataSetConnections>
+//  </DataSetConnectionSection>
 
-#endregion
+namespace pSCANNER.DataMart.Model.processor.DataSetMapping.Configuration {
 
-#region Using
-
-using System;
-
-
-#endregion
-
-namespace Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.Configuration {
-
-    public static class DataSetConnection {
+    /// <summary>
+    /// </summary>
+    public class DataSetConnection : IDataSetConnection {
 
         /// <summary>
-        ///     Gets the specified name.
+        ///     Gets or sets the type of the connection.
         /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns></returns>
-        public static BaseDataSetConnection Get(string name) {
+        /// <value>The type of the connection.</value>
+        public String ConnectionType { get; set; }
 
-            //<DataSetConnectionSection>
-            //    <DataSetConnections>
-            //      <add Name="Example" ConnectionType="HTTP" DataType="CSV" Uri="http://www.ats.ucla.edu/stat/data/binary.csv" />
-            //      <add Name="Test" ConnectionType="Database" DataType="MSSQL" Uri="Server=DAX-PC;Database=pScannerDataSources;User Id=myUsername;Password=myPassword;" Version="1.0" />
-            //      <add Name="MTE" ConnectionType="Database" DataType="MSSQL" Uri="Server=NLDMIWUA51323FX\\DEVELOPMENT;Database=pScannerDataSources;Trusted_Connection=True;" Version="1.0"/>
-            //    </DataSetConnections>
-            //  </DataSetConnectionSection>
+        /// <summary>
+        ///     Gets or sets the type of the data.
+        /// </summary>
+        /// <value>The type of the data.</value>
+        public String DataType { get; set; }
 
-            BaseDataSetConnection connection = null;
+        /// <summary>
+        ///     Gets or sets the name.
+        /// </summary>
+        /// <value>The name.</value>
+        public String Name { get; set; }
 
-            //var section = (DataSetConnectionSection) ConfigurationManager.GetSection(DataSetConnectionSection.SectionName);
-            IRegistry registry = new AppConfigRegistry();
-            var dataSetConnectionElementMap = registry.GetDataSetConnectionElementMap();
+        /// <summary>
+        ///     Gets or sets the URI.
+        /// </summary>
+        /// <value>The URI.</value>
+        public String Uri { get; set; }
 
-            var dataSetConnectionElement = dataSetConnectionElementMap[name];
-
-            switch (dataSetConnectionElement.ConnectionType) {
-
-                case DataSetConnectionElement.ConnectionTypeEnum.HTTP: {
-                    connection = new HttpDataSetConnection(dataSetConnectionElement);
-                    break;
-                }
-                case DataSetConnectionElement.ConnectionTypeEnum.Database: {
-                    connection = new DatabaseDataSetConnection(dataSetConnectionElement);
-                    break;
-                }
-                default: {
-                    throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            return connection;
-        }
-
+        /// <summary>
+        ///     Gets the version.
+        /// </summary>
+        /// <value>The version.</value>
+        public string Version { get; internal set; }
     }
-
 }

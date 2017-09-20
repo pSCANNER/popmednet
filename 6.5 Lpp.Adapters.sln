@@ -79,7 +79,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pScanner", "pScanner", "{1D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lpp.Dns.DTO.Scanner", "Lpp.Dns.DTO.Scanner\Lpp.Dns.DTO.Scanner.csproj", "{E46B9B37-5144-4EB6-BFC1-85CDFCCBB6E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnit.Lpp.pScanner.DataMart.Model.Processors", "NUnit.Tests1\NUnit.Lpp.pScanner.DataMart.Model.Processors.csproj", "{8EDF4429-251A-416D-BB68-93F227191BCF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnit.Lpp.pScanner.DataMart.Model.Processors", "NUnit.Lpp.pScanner.DataMart.Model.Processors\NUnit.Lpp.pScanner.DataMart.Model.Processors.csproj", "{8EDF4429-251A-416D-BB68-93F227191BCF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

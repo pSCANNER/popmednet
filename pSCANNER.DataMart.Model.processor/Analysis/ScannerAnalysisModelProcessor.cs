@@ -22,6 +22,7 @@ using Newtonsoft.Json;
 using pSCANNER.DataMart.Model.processor.Analysis;
 using pSCANNER.DataMart.Model.processor.Analysis.Common;
 using pSCANNER.DataMart.Model.processor.Common.Base;
+using pSCANNER.DataMart.Model.processor.DataSetMapping.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -115,7 +116,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
                 var dataSetJson = DatasetJson;
                 var pmmlJson = PmmlJson;
 
-                ResponseJson = GetResponse(requestId, parametersJson, dataSetJson, pmmlJson, Settings);
+                ResponseJson = getResponse(requestId, parametersJson, dataSetJson, pmmlJson, Settings);
 
                 const string responseDocType = "xml";
                 var document = new Document("0", string.Format("application/{0}", responseDocType), string.Format("response.{0}", responseDocType)) { IsViewable = false, Size = ResponseJson.Length };
@@ -220,10 +221,10 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
         /// <param name="pmmlJson">The PMML json.</param>
         /// <param name="settings">The settings.</param>
         /// <returns></returns>
-        private string GetResponse(string requestId, string parametersJson, string dataSetJson, string pmmlJson, IDictionary<string, object> settings) {
+        private string getResponse(string requestId, string parametersJson, string dataSetJson, string pmmlJson, IDictionary<string, object> settings) {
             var extensions = GetExtensions(parametersJson);
             var dataSetName = GetDataSetName(dataSetJson);
-            var connection = DataSetConnection.Get(dataSetName);
+            IDataSetConnection connection = BaseDataSetConnection.Get(dataSetName);
             var iterative = IsIterative(extensions);
 
             BaseProxyRequestParameter requestParameter;

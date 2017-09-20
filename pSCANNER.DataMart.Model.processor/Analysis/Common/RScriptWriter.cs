@@ -18,6 +18,8 @@ using Lpp.Scanner.DataMart.Model.Processors.Common.Models;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Parameters;
 using Lpp.Scanner.DataMart.Model.Processors.Common.R;
 using Lpp.Scanner.DataMart.Model.Processors.DataSetMapping;
+using pSCANNER.DataMart.Model.processor.DataSetMapping;
+using pSCANNER.DataMart.Model.processor.DataSetMapping.Configuration;
 using System;
 using System.Linq;
 using System.Text;
@@ -62,7 +64,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
 
             var coefficientValues = String.Join(", ", enumerable.OrderBy(x => x.ParameterName).Select(x => x.Value.ToString()));
 
-            IRegistry registry = new AppConfigRegistry();
+            IRegistry registry = new PSCANNERRegistry();
             var rSection = registry.getRSection();
 
             rSection = HttpUtility.HtmlDecode(rSection);
@@ -129,7 +131,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         /// <param name="connection">The connection.</param>
         /// <returns></returns>
         /// <exception cref="UnexpectedSwitchValue"></exception>
-        private static string CreateDataConnectionString(Type type, BaseDataSetConnection connection) {
+        private static string CreateDataConnectionString(Type type, IDataSetConnection connection) {
             string readString;
 
             ConnectAs connectAs = ConnectAs.Undefined;
@@ -142,7 +144,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
 
             switch (connectAs) {
                 case ConnectAs.HTTP: {
-                        readString = string.Format("{1} <- as.matrix(read.csv(\"{0}\"))", ((HttpDataSetConnection)connection).Url, LocalConstants.DataSet);
+                        readString = string.Format("{1} <- as.matrix(read.csv(\"{0}\"))", connection.Uri, LocalConstants.DataSet);
                         break;
                     }
                 case ConnectAs.SqlDataBase: {
@@ -153,7 +155,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
                         sb.AppendLine("library(RODBC);");
                         sb.AppendLine("}");
                         sb.AppendLine("");
-                        var connectionString = ((DatabaseDataSetConnection)connection).ConnectionString;
+                        var connectionString = connection.Uri;
 
                         var match = _queryMatch.Match(connectionString);
                         if (match.Success) {

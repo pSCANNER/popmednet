@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.Configuration;
+using pSCANNER.DataMart.Model.processor.DataSetMapping.Configuration;
 
 namespace Lpp.Scanner.DataMart.Model.Processors.DataSetMapping {
 
@@ -11,7 +12,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.DataSetMapping {
         ///     Gets the data set connection element map.
         /// </summary>
         /// <returns></returns>
-        Dictionary<string, DataSetConnectionElement> GetDataSetConnectionElementMap();
+        Dictionary<string, IDataSetConnection> GetDataSetConnectionElementMap();
 
         /// <summary>
         ///     Gets the r section.

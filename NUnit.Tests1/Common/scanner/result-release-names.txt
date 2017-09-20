@@ -1,5 +1,0 @@
-[
- {"Name":"No manual approval","Description":"No manual approval"},
- {"Name":"Every time manual approval","Description":"Every time manual approval"},
- {"Name":"One time manual approval","Description":"One time manual approval"}
-]

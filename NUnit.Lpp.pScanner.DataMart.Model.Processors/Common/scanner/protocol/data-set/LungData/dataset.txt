@@ -1,0 +1,49 @@
+{
+"DataSetName": "LungData",
+  "DataDictionary": {
+    "numberOfFields": "9",
+    "DataField": [
+      {
+        "name": "status",
+        "optype": "dichotomous",
+        "dataType": "double"
+      },
+      {
+        "name": "stime",
+        "optype": "continuous",
+        "dataType": "double"
+      },
+      {
+        "name": "treat",
+        "optype": "categorical",
+        "dataType": "string",
+      },
+      {
+        "name": "age",
+        "optype": "continuous",
+        "dataType": "double"
+      },
+      {
+        "name": "Karn",
+        "optype": "continuous",
+        "dataType": "double"
+      },
+      {
+        "name": "diag.time",
+        "optype": "continuous",
+        "dataType": "double"
+      },
+      {
+        "name": "cell",
+        "optype": "categorical",
+        "dataType": "string",
+
+      },
+      {
+        "name": "prior",
+        "optype": "categorical",
+        "dataType": "string",
+      }
+    ]
+  }
+}

@@ -1,9 +1,0 @@
-[
- {'Name':'Cancer_CRG_Data','Description':'Cancer CRG Data Set','DataSetURL':'scanner/data-set/Cancer_CRG_Data/'},
- {'Name':'Surgery_CRG_Data','Description':'Surgery CRG Data Set','DataSetURL':'scanner/data-set/Surgery_CRG_Data/'},
- {'Name':'PCORnet CDM','Description':'PCORnet CDM','DataSetURL':'scanner/data-set/pcornet-cdm/'},
- {'Name':'OMOP CDM','Description':'OMOP CDM','DataSetURL':'scanner/data-set/omop-cdm/'},
- {'Name':'I2B2','Description':'I2B2','DataSetURL':'scanner/data-set/i2b2/'},
- {'Name':'Quality Data Model','Description':'Quality Data Model','DataSetURL':'scanner/data-set/data-quality/'},
- {'Name':'MTE','Description':'MTE DataSet','DataSetURL':'scanner/data-set/mte/'}
-]

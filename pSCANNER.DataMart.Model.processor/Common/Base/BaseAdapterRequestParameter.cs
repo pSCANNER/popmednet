@@ -1,46 +1,45 @@
 #region Legal Information
 
 // ====================================================================================
-//  
-//      Center for Population Health Informatics
-//      Solution: Lpp.Adapters
-//      Project: Lpp.Scanner.DataMart.Model.Processors
-//      Last Updated By: Westerman, Dax Marek
-// 
+//
+// Center for Population Health Informatics
+// Solution: Lpp.Adapters
+// Project: Lpp.Scanner.DataMart.Model.Processors Last Updated By: Westerman, Dax Marek
+//
 // ====================================================================================
 
-#endregion
+#endregion Legal Information
 
 using Lpp.Scanner.DataMart.Model.Processors.DataSetMapping;
-
+using pSCANNER.DataMart.Model.processor.DataSetMapping.Configuration;
 
 namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
 
     public abstract class BaseAdapterRequestParameter : BaseRequestParameter {
+
         #region Constructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="BaseAdapterRequestParameter" /> class.
+        ///     Initializes a new instance of the <see cref="BaseAdapterRequestParameter"/> class.
         /// </summary>
         /// <param name="requestParameter">The request parameter.</param>
-        protected BaseAdapterRequestParameter(BaseRequestParameter requestParameter) : base(requestParameter) {}
+        protected BaseAdapterRequestParameter(BaseRequestParameter requestParameter) : base(requestParameter) { }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="BaseAdapterRequestParameter" /> class.
+        ///     Initializes a new instance of the <see cref="BaseAdapterRequestParameter"/> class.
         /// </summary>
         /// <param name="requestId">The request identifier.</param>
         /// <param name="requestFor">The request for.</param>
         /// <param name="dataSetConnection"></param>
-        protected BaseAdapterRequestParameter(string requestId, RequestForEnum requestFor, BaseDataSetConnection dataSetConnection) : base(requestId, requestFor, dataSetConnection) {}
+        protected BaseAdapterRequestParameter(string requestId, RequestForEnum requestFor, IDataSetConnection dataSetConnection) : base(requestId, requestFor, dataSetConnection) { }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="BaseAdapterRequestParameter" /> class.
+        ///     Initializes a new instance of the <see cref="BaseAdapterRequestParameter"/> class.
         /// </summary>
         /// <param name="requestId">The request identifier.</param>
         /// <param name="requestFor">The request for.</param>
-        protected BaseAdapterRequestParameter(string requestId, RequestForEnum requestFor) : base(requestId, requestFor) {}
+        protected BaseAdapterRequestParameter(string requestId, RequestForEnum requestFor) : base(requestId, requestFor) { }
 
-        #endregion
+        #endregion Constructors
     }
-
 }
