@@ -40,7 +40,6 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         /// <exception cref="System.Exception"></exception>
         public static string GenerateRScript(AggregatorClientRequestParameter parameter) {
             var ppMatrix = parameter.Pmml.GetPPMatrix();
-
             var paramMatrix = parameter.Pmml.GetParamMatrix();
             var requestParameterList = parameter.Pmml.GetRequestParameterList();
             var requestParameters = new RequestParameterList { Parameters = requestParameterList.RequestParameters };
@@ -70,6 +69,17 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
             rSection = HttpUtility.HtmlDecode(rSection);
 
             return BuildScript(parameter, family, miningFields, independentVariables, coefficientValues, rSection);
+        }
+
+        internal static string GenerateRScript(AnalysticsRequestParameter parameter) {
+            string ret_val = string.Empty;
+            var requestParameterList = parameter.Pmml.GetRequestParameterList();
+            var requestParameters = new RequestParameterList { Parameters = requestParameterList.RequestParameters };
+            var linkFunction = parameter.Pmml.GetLinkFunction(LocalConstants.LinkFunctionName.GetValue());
+            var family = parameter.Pmml.GetFamily(LocalConstants.FamilyName.GetValue());
+            var miningFields = new MiningFields { DependantVariable = parameter.Pmml.GetMiningSchema().DependentVariable, IndependantVariables = parameter.Pmml.GetMiningSchema().IndependantVariables };
+            var independentVariables = miningFields.IndependantVariables.Select(x => String.Format(@"""{0}""", x)).ToArray();
+            return ret_val;
         }
 
         /// <summary>
@@ -176,7 +186,5 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         }
 
         private static readonly Regex _queryMatch = new Regex(@"Query=(?<query>[\p{L}\s\*\[\]\._\d]+)(?:;|$)", RegexOptions.Compiled);
-
-        internal static string GenerateRScript(AnalysticsRequestParameter aggrParam) => throw new NotImplementedException();
     }
 }

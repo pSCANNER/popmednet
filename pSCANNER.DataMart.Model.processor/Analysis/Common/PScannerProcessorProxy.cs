@@ -353,6 +353,9 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
             if (parameter is AnalysticsRequestParameter) {
                 var aggrParam = (AnalysticsRequestParameter)parameter;
                 rScript = RScriptWriter.GenerateRScript(aggrParam);
+                var dataDictionary = aggrParam.Pmml.GetDataDictionary();
+                var family = aggrParam.Pmml.GetFamily(LocalConstants.FamilyName.GetValue());
+                var linkFunction = aggrParam.Pmml.GetLinkFunction(LocalConstants.LinkFunctionName.GetValue());
 
                 conv = (r, req, objs) => {
                     var pmml = new PmmlScriptBuilder();
@@ -366,11 +369,25 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
                     pmml.AddLine(@"<Timestamp>2015-04-21 12:54:37</Timestamp>");
                     pmml.AddLine(@"</Header>");
 
+                    pmml.AddLine(@"<DataDictionary numberOfFields=""{0}"">", dataDictionary.NumberOfFields.ToString());
+
+                    foreach (var independentVariable in dataDictionary.DataFields) {
+                        pmml.AddLine(@"<DataField name=""{0}"" optype=""{1}"" dataType=""{2}""></DataField>", independentVariable.Value.Name, independentVariable.Value.Optype, independentVariable.Value.DataType);
+                    }
+
+                    pmml.AddLine(@"</DataDictionary>");
+
+                    pmml.AddLine(@"<GeneralRegressionModel modelName=""General_Regression_Model"" modelType=""regression"" {3}=""{2}"" algorithmName=""glm"" distribution=""normal"" {0}=""{1}"">", LocalConstants.LinkFunctionName, linkFunction, family, LocalConstants.FamilyName);
+
+                    pmml.AddLine(@"</GeneralRegressionModel>");
+                    pmml.AddLine(@"</PMML>");
+
                     return pmml.ToString();
                 };
             } else {
                 var aggrParam = (AggregatorClientRequestParameter)parameter;
                 rScript = RScriptWriter.GenerateRScript(aggrParam);
+                var dataDictionary = aggrParam.Pmml.GetDataDictionary();
 
                 conv = (r, req, objs) => {
                     var model = ErrorAndCovarianceModel.Create(r);
