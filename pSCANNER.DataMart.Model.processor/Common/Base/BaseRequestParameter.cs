@@ -15,7 +15,7 @@ using pSCANNER.DataMart.Model.processor.DataSetMapping.Configuration;
 
 namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
 
-    public abstract class BaseRequestParameter {
+    public abstract class BaseRequestParameter : IDataSetConnectionParameter {
 
         /// <summary>
         ///     Sets the request for.
@@ -73,7 +73,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         ///     Gets the data set connection.
         /// </summary>
         /// <value>The data set connection.</value>
-        public IDataSetConnection DataSetConnection { get; private set; }
+        public IDataSetConnection DataSetConnection { get; set; }
 
         /// <summary>
         ///     Gets or sets the type of the request.

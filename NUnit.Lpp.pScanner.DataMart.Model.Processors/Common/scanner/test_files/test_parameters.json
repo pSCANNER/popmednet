@@ -1,73 +1,14 @@
 ﻿{
-  "name": "GeneralRegressionModel",
-  "parameters": [
-    {
-      "id": "PMML.GeneralRegressionModel.modelName",
-      "label": "",
-      "type": "string",
-      "control": "hidden",
-      "values": [ "General_Regression_Model" ]
-    },
-    {
-      "id": "PMML.GeneralRegressionModel.linkFunction",
-      "label": "Link Function",
-      "type": "string",
-      "control": "dropdown",
-      "required": true,
-      "availableValues": [ "identity", "logit", "probit", "cloglog", "loglog", "cauchit" ],
-      "values": [ "identity" ]
-    },
-    {
-      "id": "PMML.GeneralRegressionModel.MiningSchema.MiningField.target",
-      "label": "Predicted",
-      "type": "string",
-      "control": "PMML.DataDictionary.Single",
-      "required": false,
-      "values": [ "rank" ]
-    },
-    {
-      "id": "PMML.GeneralRegressionModel.MiningSchema.MiningField.active",
-      "label": "Active",
-      "type": "stringArray",
-      "control": "PMML.DataDictionary.Multi",
-      "required": true,
-      "values": [ "admit", "gre", "gpa" ]
-    },
-    {
-      "id": "PMML.GeneralRegressionModel.functionName",
-      "label": "Function Name",
-      "type": "string",
-      "control": "dropdown",
-      "required": true,
-      "availableValues": [ "logit", "probit", "cloglog", "loglog", "cauchit" ],
-      "values": [ "logit" ]
-    },
-    {
-      "id": "PMML.GeneralRegressionModel.modelType",
-      "label": "Model Type",
-      "type": "string",
-      "control": "dropdown",
-      "required": true,
-      "availableValues": [ "regression", "generalLinear", "multinomialLogistic", "ordinalMultinomial", "generalizedLinear", "CoxRegression" ],
-      "values": [ "regression" ]
-    },
-    {
-      "id": "PMML.GeneralRegressionModel.distribution",
-      "label": "Distribution",
-      "type": "string",
-      "control": "dropdown",
-      "required": true,
-      "availableValues": [ "binomial", "gamma", "igauss", "negbin", "normal", "poisson", "tweedie" ],
-      "values": [ "normal" ]
-    },
-    {
-      "id": "PMML.GeneralRegressionModel.algorithmName",
-      "label": "Algorithm Name",
-      "type": "string",
-      "control": "dropdown",
-      "required": true,
-      "availableValues": [ "glm" ],
-      "values": [ "glm" ]
-    }
-  ]
+  "PMML.GeneralRegressionModel.modelName": "General_Regression_Model",
+  "PMML.GeneralRegressionModel.linkFunction": "identity",
+  "PMML.GeneralRegressionModel.MiningSchema.MiningField.target": "rank",
+  "PMML.GeneralRegressionModel.MiningSchema.MiningField.active": [
+    "admit",
+    "gre",
+    "gpa"
+  ],
+  "PMML.GeneralRegressionModel.functionName": "logit",
+  "PMML.GeneralRegressionModel.modelType": "regression",
+  "PMML.GeneralRegressionModel.distribution": "normal",
+  "PMML.GeneralRegressionModel.algorithmName": "glm"
 }

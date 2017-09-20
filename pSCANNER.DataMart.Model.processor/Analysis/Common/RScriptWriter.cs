@@ -176,5 +176,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         }
 
         private static readonly Regex _queryMatch = new Regex(@"Query=(?<query>[\p{L}\s\*\[\]\._\d]+)(?:;|$)", RegexOptions.Compiled);
+
+        internal static string GenerateRScript(AnalysticsRequestParameter aggrParam) => throw new NotImplementedException();
     }
 }

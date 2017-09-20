@@ -1,7 +1,7 @@
 ﻿{
   "DataSetName": "UCLA_LogReg_CSV",
   "DataDictionary": {
-    "numberOfFields": 5,
+    "numberOfFields": 4,
     "DataField": [
       {
         "name": "admit",

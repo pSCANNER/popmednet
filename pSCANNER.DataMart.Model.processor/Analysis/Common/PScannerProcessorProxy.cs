@@ -48,8 +48,8 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
              */
 
             // RequestId=
-            if (requestParameter is DanRequestParameter) {
-                var processorRequestParameter = ((DanRequestParameter)requestParameter);
+            if (requestParameter is AnalysticsRequestParameter) {
+                var processorRequestParameter = ((AnalysticsRequestParameter)requestParameter);
                 var requestUriString = string.Format("{0}/{1}?{2}={3}", processorRequestParameter.ServiceUrl, BaseRequestParameter.RequestForEnum.GetResponse, BaseRequestParameter.RequestForEnum.RequestId, requestParameter.RequestId);
                 var responseFromServer = (new WebAdapter()).PerformRequest(new WebServiceRequestParameter(requestUriString, requestParameter.RequestId));
 
@@ -85,8 +85,8 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
              */
 
             // get RequestId=
-            if (requestParameter is DanRequestParameter) {
-                var processorRequestParameter = ((DanRequestParameter)requestParameter);
+            if (requestParameter is AnalysticsRequestParameter) {
+                var processorRequestParameter = ((AnalysticsRequestParameter)requestParameter);
                 var requestUriString = string.Format("{0}/{1}?{2}={3}", processorRequestParameter.ServiceUrl, BaseRequestParameter.RequestForEnum.GetStatus, BaseRequestParameter.RequestForEnum.RequestId, requestParameter.RequestId);
                 responseFromServer = (new WebAdapter()).PerformRequest(new WebServiceRequestParameter(requestUriString, requestParameter.RequestId));
             } else {
@@ -114,16 +114,18 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
 
             var combinedJson = combineJsonDocs((IUserJsonInputParameter)parameter);
 
-            if (parameter is DanRequestParameter) {
-                var xmlPmmlRequest = convertJsonPmmlToXmlPmml(combinedJson);
-                var requestUriString = string.Format("{0}/{1}?{2}={3}&{4}={5}", ((DanRequestParameter)parameter).ServiceUrl, BaseRequestParameter.RequestForEnum.PostRequest, BaseRequestParameter.RequestForEnum.RequestId, parameter.RequestId, BaseRequestParameter.RequestForEnum.RequestXml, xmlPmmlRequest);
-                adapter = new WebAdapter();
-                adapterParameter = new WebServiceRequestParameter(requestUriString, parameter.RequestId);
-            } else if (parameter is AggregatorClientRequestParameter) {
-                adapter = initializeAdapter(parameter, combinedJson, out adapterParameter);
-            } else {
-                throw new NullReferenceException(string.Format("Do not know how to handle {0}", parameter.GetType()));
-            }
+            //if (parameter is AnalysticsRequestParameter) {
+            //    var xmlPmmlRequest = convertJsonPmmlToXmlPmml(combinedJson);
+            //    var requestUriString = string.Format("{0}/{1}?{2}={3}&{4}={5}", ((AnalysticsRequestParameter)parameter).ServiceUrl, BaseRequestParameter.RequestForEnum.PostRequest, BaseRequestParameter.RequestForEnum.RequestId, parameter.RequestId, BaseRequestParameter.RequestForEnum.RequestXml, xmlPmmlRequest);
+            //    adapter = new WebAdapter();
+            //    adapterParameter = new WebServiceRequestParameter(requestUriString, parameter.RequestId);
+            //} else if (parameter is AggregatorClientRequestParameter) {
+            //    adapter = initializeAdapter(parameter, combinedJson, out adapterParameter);
+            //} else {
+            //    throw new NullReferenceException(string.Format("Do not know how to handle {0}", parameter.GetType()));
+            //}
+
+            adapter = initializeAdapter(parameter, combinedJson, out adapterParameter);
 
             /*
              * Request
@@ -144,7 +146,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         /// <returns></returns>
         /// <exception cref="System.NotImplementedException"></exception>
         protected override ResponseBase DoStop(BaseRequestParameter requestParameter) {
-            var processorRequestParameter = ((DanRequestParameter)requestParameter);
+            var processorRequestParameter = ((AnalysticsRequestParameter)requestParameter);
             var requestUriString = string.Format("{0}/{1}?{2}={3}", processorRequestParameter.ServiceUrl, BaseRequestParameter.RequestForEnum.StopRequest, BaseRequestParameter.RequestForEnum.RequestId, requestParameter.RequestId);
             return (new WebAdapter()).PerformRequest(new WebServiceRequestParameter(requestUriString, requestParameter.RequestId));
         }
@@ -286,7 +288,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         /// <param name="aggrParam">The aggr parameter.</param>
         /// <param name="adapterParameter">The adapter parameter.</param>
         /// <returns></returns>
-        private static BaseAdapter getAdapter(BaseRequestParameter parameter, Func<string, BaseRequestParameter, object[], string> conv, string rScript, AggregatorClientRequestParameter aggrParam, out BaseRequestParameter adapterParameter) {
+        private static BaseAdapter getAdapter(BaseRequestParameter parameter, Func<string, BaseRequestParameter, object[], string> conv, string rScript, IRExecution aggrParam, out BaseRequestParameter adapterParameter) {
             BaseAdapter adapter = new RAdapter(conv);
             adapterParameter = new RRequestParameter(rScript, aggrParam.ExecutionPath, parameter.RequestId, BaseRequestParameter.RequestForEnum.PostRequest, aggrParam.DataSetConnection);
             return adapter;
@@ -336,54 +338,82 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         /// <param name="adapterParameter">The adapter parameter.</param>
         /// <returns></returns>
         private static BaseAdapter initializeAdapter(BaseRequestParameter parameter, string combinedJson, out BaseRequestParameter adapterParameter) {
-            var aggrParam = (AggregatorClientRequestParameter)parameter;
-            var xmlPmmlRequest = convertJsonPmmlToXmlPmml(combinedJson, false);
-            aggrParam.SetPmmlDocument(xmlPmmlRequest);
-            var rScript = RScriptWriter.GenerateRScript(aggrParam);
+            BaseAdapter adapter = null;
+            string xmlPmmlRequest = null;
+            Func<string, BaseRequestParameter, object[], string> conv = null;
+            string rScript = null;
 
-            //EventLog.WriteEntry(_source, rScript, EventLogEntryType.Information);
+            if (parameter is AggregatorClientRequestParameter || parameter is AnalysticsRequestParameter) {
+                xmlPmmlRequest = convertJsonPmmlToXmlPmml(combinedJson, false);
+                ((IRExecution)parameter).SetPmmlDocument(xmlPmmlRequest);
+            } else {
+                throw new NullReferenceException(string.Format("Do not know how to handle {0}", parameter.GetType()));
+            }
 
-            Func<string, BaseRequestParameter, object[], string> conv = (r, req, objs) => {
-                var model = ErrorAndCovarianceModel.Create(r);
+            if (parameter is AnalysticsRequestParameter) {
+                var aggrParam = (AnalysticsRequestParameter)parameter;
+                rScript = RScriptWriter.GenerateRScript(aggrParam);
 
-                var dataDictionary = aggrParam.Pmml.GetDataDictionary();
-                var family = aggrParam.Pmml.GetFamily(LocalConstants.FamilyName.GetValue());
-                var linkFunction = aggrParam.Pmml.GetLinkFunction(LocalConstants.LinkFunctionName.GetValue());
+                conv = (r, req, objs) => {
+                    var pmml = new PmmlScriptBuilder();
+                    pmml.AddLine(@"<?xml version=""1.0"" encoding=""utf-8""?>");
+                    pmml.AddLine(@"<PMML version=""4.2"" xmlns=""http://www.dmg.org/PMML-4_2"">");
+                    pmml.AddLine(@"<Header copyright=""Copyright (c) 2015 user"" description=""Generalized Linear Regression Model"">");
 
-                var pmml = new PmmlScriptBuilder();
+                    pmml.AddLine(string.Format(@"<Extension name=""convergence"">{0}</Extension>", model.ConvergenceWarning.GetPmmlValue()));
+                    pmml.AddLine(string.Format(@"<Extension name=""errorGradient"">{0}</Extension>", model.ErrorGradient.GetPmmlValue()));
+                    pmml.AddLine(@"<Application name=""pScannerAggregatorClient"" version=""0.1""></Application>");
+                    pmml.AddLine(@"<Timestamp>2015-04-21 12:54:37</Timestamp>");
+                    pmml.AddLine(@"</Header>");
 
-                pmml.AddLine(@"<?xml version=""1.0"" encoding=""utf-8""?>");
-                pmml.AddLine(@"<PMML version=""4.2"" xmlns=""http://www.dmg.org/PMML-4_2"">");
-                pmml.AddLine(@"<Header copyright=""Copyright (c) 2015 user"" description=""Generalized Linear Regression Model"">");
+                    return pmml.ToString();
+                };
+            } else {
+                var aggrParam = (AggregatorClientRequestParameter)parameter;
+                rScript = RScriptWriter.GenerateRScript(aggrParam);
 
-                pmml.AddLine(string.Format(@"<Extension name=""convergence"">{0}</Extension>", model.ConvergenceWarning.GetPmmlValue()));
-                pmml.AddLine(string.Format(@"<Extension name=""errorGradient"">{0}</Extension>", model.ErrorGradient.GetPmmlValue()));
-                pmml.AddLine(@"<Application name=""pScannerAggregatorClient"" version=""0.1""></Application>");
-                pmml.AddLine(@"<Timestamp>2015-04-21 12:54:37</Timestamp>");
-                pmml.AddLine(@"</Header>");
+                conv = (r, req, objs) => {
+                    var model = ErrorAndCovarianceModel.Create(r);
 
-                pmml.AddLine(@"<DataDictionary numberOfFields=""{0}"">", dataDictionary.NumberOfFields.ToString());
+                    var family = aggrParam.Pmml.GetFamily(LocalConstants.FamilyName.GetValue());
+                    var linkFunction = aggrParam.Pmml.GetLinkFunction(LocalConstants.LinkFunctionName.GetValue());
 
-                foreach (var independentVariable in dataDictionary.DataFields) {
-                    pmml.AddLine(@"<DataField name=""{0}"" optype=""{1}"" dataType=""{2}""></DataField>", independentVariable.Value.Name, independentVariable.Value.Optype, independentVariable.Value.DataType);
-                }
+                    var pmml = new PmmlScriptBuilder();
 
-                pmml.AddLine(@"</DataDictionary>");
+                    pmml.AddLine(@"<?xml version=""1.0"" encoding=""utf-8""?>");
+                    pmml.AddLine(@"<PMML version=""4.2"" xmlns=""http://www.dmg.org/PMML-4_2"">");
+                    pmml.AddLine(@"<Header copyright=""Copyright (c) 2015 user"" description=""Generalized Linear Regression Model"">");
 
-                pmml.AddLine(@"<GeneralRegressionModel modelName=""General_Regression_Model"" modelType=""regression"" {3}=""{2}"" algorithmName=""glm"" distribution=""normal"" {0}=""{1}"">", LocalConstants.LinkFunctionName, linkFunction, family, LocalConstants.FamilyName);
+                    pmml.AddLine(string.Format(@"<Extension name=""convergence"">{0}</Extension>", model.ConvergenceWarning.GetPmmlValue()));
+                    pmml.AddLine(string.Format(@"<Extension name=""errorGradient"">{0}</Extension>", model.ErrorGradient.GetPmmlValue()));
+                    pmml.AddLine(@"<Application name=""pScannerAggregatorClient"" version=""0.1""></Application>");
+                    pmml.AddLine(@"<Timestamp>2015-04-21 12:54:37</Timestamp>");
+                    pmml.AddLine(@"</Header>");
 
-                pmml.AddLine(@"<PCovMatrix>");
+                    pmml.AddLine(@"<DataDictionary numberOfFields=""{0}"">", dataDictionary.NumberOfFields.ToString());
 
-                pmml.AddLine(model.UnscaledCovariance.GetPmmlValue());
+                    foreach (var independentVariable in dataDictionary.DataFields) {
+                        pmml.AddLine(@"<DataField name=""{0}"" optype=""{1}"" dataType=""{2}""></DataField>", independentVariable.Value.Name, independentVariable.Value.Optype, independentVariable.Value.DataType);
+                    }
 
-                pmml.AddLine(@"</PCovMatrix>");
-                pmml.AddLine(@"</GeneralRegressionModel>");
-                pmml.AddLine(@"</PMML>");
+                    pmml.AddLine(@"</DataDictionary>");
 
-                return pmml.ToString();
-            };
+                    pmml.AddLine(@"<GeneralRegressionModel modelName=""General_Regression_Model"" modelType=""regression"" {3}=""{2}"" algorithmName=""glm"" distribution=""normal"" {0}=""{1}"">", LocalConstants.LinkFunctionName, linkFunction, family, LocalConstants.FamilyName);
 
-            var adapter = getAdapter(parameter, conv, rScript, aggrParam, out adapterParameter);
+                    pmml.AddLine(@"<PCovMatrix>");
+
+                    pmml.AddLine(model.UnscaledCovariance.GetPmmlValue());
+
+                    pmml.AddLine(@"</PCovMatrix>");
+                    pmml.AddLine(@"</GeneralRegressionModel>");
+                    pmml.AddLine(@"</PMML>");
+
+                    return pmml.ToString();
+                };
+            }
+
+            adapter = getAdapter(parameter, conv, rScript, (IRExecution)parameter, out adapterParameter);
+
             return adapter;
         }
 
@@ -441,12 +471,12 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
 
             var enumerable = properties as JProperty[] ?? properties.ToArray();
 
+            MaxIterationsVal = 20;
+
             foreach (var x in enumerable) {
                 JToken parentItem;
                 JToken currentItem = combinedJsonObject;
                 var namespacePieces = x.Name.Split('.');
-
-                MaxIterationsVal = 20;
 
                 if (x.Name.Contains(VariableConstants.MaxIterationsConst)) {
                     var maxIterations = x.Value.ToString();
@@ -546,8 +576,10 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
                                 break;
                             }
                         default: {
-                                var jValue = ((JValue)currentItem);
-                                jValue.Value = x.Value.ToString();
+                                if (currentItem != null) {
+                                    var jValue = ((JValue)currentItem);
+                                    jValue.Value = x.Value.ToString();
+                                }
                                 break;
                             }
                     }

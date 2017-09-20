@@ -14,8 +14,6 @@
 
 using Lpp.Scanner.DataMart.Model.Processors.Common.Base;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Pmml;
-using Lpp.Scanner.DataMart.Model.Processors.DataSetMapping;
-using Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.Configuration;
 using pSCANNER.DataMart.Model.processor.DataSetMapping.Configuration;
 
 #endregion Using
@@ -55,13 +53,13 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Parameters {
         ///     Gets the execution path.
         /// </summary>
         /// <value>The execution path.</value>
-        public string ExecutionPath { get; private set; }
+        public string ExecutionPath { get; set; }
 
         /// <summary>
         ///     Gets the coefficient PMML.
         /// </summary>
         /// <value>The coefficient PMML.</value>
-        public PmmlDocument Pmml { get; private set; }
+        public PmmlDocument Pmml { get; set; }
 
         #endregion Properties
 

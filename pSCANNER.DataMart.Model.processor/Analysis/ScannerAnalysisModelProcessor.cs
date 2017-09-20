@@ -235,7 +235,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
                 requestParameter = new AggregatorClientRequestParameter(requestId, dataSetJson, parametersJson, pmmlJson, connection, rLocation);
             } else {
                 var serviceUrl = settings.GetAsString(Constants.Processor.Input.SettingsEnum.DanURL.ToString(), string.Empty);
-                requestParameter = new DanRequestParameter(requestId, dataSetJson, parametersJson, pmmlJson, connection, serviceUrl);
+                requestParameter = new AnalysticsRequestParameter(requestId, dataSetJson, parametersJson, pmmlJson, connection, serviceUrl);
             }
 
             var requestResponse = Proxy.PostRequest(requestParameter);

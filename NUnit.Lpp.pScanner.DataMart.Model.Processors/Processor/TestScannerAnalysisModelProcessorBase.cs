@@ -1,5 +1,6 @@
 ﻿using Lpp.Dns.DataMart.Model;
 using Lpp.Scanner.DataMart.Model.Processors.Analysis;
+using Lpp.Scanner.DataMart.Model.Processors.Analysis.Common;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Processor.Task;
 using Moq;
 using NUnit.Framework;
@@ -21,7 +22,7 @@ namespace NUnit.Lpp.pScanner.DataMart.Model.Processors.Processor {
         /// </summary>
         [OneTimeSetUp]
         public void InitializeTest() {
-            _processor = new ScannerAnalysisModelProcessor(new MockScannerAnalysisModelProcessor<AsyncTask>(), new ScannerAnalysisModelMetadata());
+            _processor = new ScannerAnalysisModelProcessor(new PScannerProcessorProxy(), new ScannerAnalysisModelMetadata());
             _network = new NetworkConnectionMetadata {
                 OrganizationName = "",
                 UserEmail = "",

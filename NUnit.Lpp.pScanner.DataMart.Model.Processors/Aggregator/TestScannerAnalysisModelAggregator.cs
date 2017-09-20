@@ -1,4 +1,5 @@
 ﻿using Lpp.Scanner.DataMart.Model.Processors.Aggregation;
+using Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Processor.Task;
 using NUnit.Framework;
 using pSCANNER.DataMart.Model.processor.Aggregation;
@@ -14,7 +15,7 @@ namespace Test.Lpp.pScanner.DataMart.Model.Processors.Aggregator {
         /// </summary>
         [OneTimeSetUp]
         public void InitializeTest() {
-            _aggregator = new ScannerAnalysisModelAggregator(new MockPScannerAggregatorProxy<AsyncTask>(), new ScannerAggregationModelMetadata());
+            _aggregator = new ScannerAnalysisModelAggregator(new PScannerAggregatorProxy<AsyncTask>(), new ScannerAggregationModelMetadata());
         }
 
         [OneTimeTearDown]

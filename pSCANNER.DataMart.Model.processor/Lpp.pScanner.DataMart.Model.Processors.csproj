@@ -80,10 +80,12 @@
     <Compile Include="Aggregation\Common\ScriptConstants.cs" />
     <Compile Include="Aggregation\Common\SiteResponse.cs" />
     <Compile Include="Aggregation\Common\VariableEntry.cs" />
+    <Compile Include="Analysis\Common\AnalysisResponse.cs" />
     <Compile Include="Analysis\Common\Helper.cs" />
     <Compile Include="Analysis\Common\LocalConstants.cs" />
     <Compile Include="Analysis\Common\MiningFields.cs" />
     <Compile Include="Analysis\Common\ProcessorResponse.cs" />
+    <Compile Include="Analysis\Common\ProcessRequest.cs" />
     <Compile Include="Analysis\Common\PScannerProcessorProxy.cs" />
     <Compile Include="Analysis\Common\RequestParameterList.cs" />
     <Compile Include="Analysis\Common\RScriptWriter.cs" />
@@ -96,6 +98,7 @@
     <Compile Include="Common\Base\BaseScriptBuilder.cs" />
     <Compile Include="Common\Base\BaseScriptParser.cs" />
     <Compile Include="Common\Base\CellBase.cs" />
+    <Compile Include="Common\Base\IDataSetConnectionParameter.cs" />
     <Compile Include="Common\Base\InternalDocument.cs" />
     <Compile Include="Common\Base\MetaDataBase.cs" />
     <Compile Include="Common\Base\PmmlBase.cs" />
@@ -123,7 +126,7 @@
     <Compile Include="Common\Parameters\AggregatorClientRequestParameter.cs" />
     <Compile Include="Common\Parameters\AggregatorResponse.cs" />
     <Compile Include="Common\Parameters\AggregatorServerRequestParameter.cs" />
-    <Compile Include="Common\Parameters\DanRequestParameter.cs" />
+    <Compile Include="Common\Parameters\AnalysticsRequestParameter.cs" />
     <Compile Include="Common\Parameters\IRExecution.cs" />
     <Compile Include="Common\Parameters\IUserJsonInputParameter.cs" />
     <Compile Include="Common\Parameters\Request\RRequestParameter.cs" />
@@ -172,6 +175,7 @@
     <Compile Include="DataSetMapping\Configuration\_archive\HttpDataSetConnection.cs" />
     <Compile Include="DataSetMapping\IRegistry.cs" />
     <Compile Include="DataSetMapping\PSCANNERRegistry.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScannerAnalysisModelTermProvider.cs" />
     <Compile Include="Study\ScannerStudyModelProcessor.cs" />
