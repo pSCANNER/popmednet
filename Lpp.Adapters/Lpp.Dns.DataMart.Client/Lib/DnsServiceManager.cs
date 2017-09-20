@@ -384,7 +384,21 @@ namespace Lpp.Dns.DataMart.Lib
         /// </summary>
         public static IObservable<int> PostResponseDocumentContent( Guid documentId, Stream stream, NetWorkSetting ns )
         {
-            byte[] buffer = new byte[0x400000];
+            byte[] buffer;
+            if (stream.Length >= 52428800)
+            {
+                buffer = new byte[52428800];
+            }
+            else if (stream.Length < 81920)
+            {
+                buffer = new byte[81920];
+            }
+            else
+            {
+                buffer = new byte[0x400000];
+            }
+
+            //byte[] buffer = new byte[31457280];
             return Observable.Generate( 
                 new { offset = 0, finish = false },
                 st => !st.finish,

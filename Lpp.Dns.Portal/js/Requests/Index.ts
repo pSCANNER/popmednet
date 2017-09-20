@@ -87,11 +87,13 @@ module Requests.Index {
 
             //PMNDEV-5057 - We need to keep the filters intact on project change, otherwise they are not retained.
             var filter = { logic: "and", filters: [] };
-            originalFilters.filters.forEach((item: kendo.data.DataSourceFilterItem) => {
-                if (item.field != "ProjectID") {
-                    filter.filters.push(item);
-                }
-            });
+            if (originalFilters !== undefined) {
+                originalFilters.filters.forEach((item: kendo.data.DataSourceFilterItem) => {
+                    if (item.field != "ProjectID") {
+                        filter.filters.push(item);
+                    }
+                });
+            }
 
             if (project.ID() == Constants.GuidEmpty) {
                 filter.filters.push({ field: "ProjectID", operator: "notequals", value: Constants.GuidEmpty });

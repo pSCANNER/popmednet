@@ -34,7 +34,7 @@ namespace Lpp.Dns.Portal.Areas.Controls.Controllers
         {
             List<Lpp.Dns.DTO.ExtendedDocumentDTO> documents = new List<Lpp.Dns.DTO.ExtendedDocumentDTO>();
 
-            using (var web = new System.Net.Http.HttpClient())
+            using (var web = new System.Net.Http.HttpClient() { Timeout = TimeSpan.FromMinutes(30) })
             {
                 web.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", authToken);
                 web.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("multipart/form-data"));
@@ -92,7 +92,7 @@ namespace Lpp.Dns.Portal.Areas.Controls.Controllers
 
             List<Lpp.Dns.DTO.ExtendedDocumentDTO> documents = new List<Lpp.Dns.DTO.ExtendedDocumentDTO>();
 
-            using (var web = new System.Net.Http.HttpClient())
+            using (var web = new System.Net.Http.HttpClient() { Timeout = TimeSpan.FromMinutes(30) })
             {
                 web.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", authToken);
                 web.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("multipart/form-data"));
@@ -192,7 +192,7 @@ namespace Lpp.Dns.Portal.Areas.Controls.Controllers
         {
             List<Lpp.Dns.DTO.ExtendedDocumentDTO> documents = new List<Lpp.Dns.DTO.ExtendedDocumentDTO>();
 
-            using (var web = new System.Net.Http.HttpClient())
+            using (var web = new System.Net.Http.HttpClient() { Timeout = TimeSpan.FromMinutes(30) })
             using(var sftp = new SftpClient(credentials.Address, credentials.Port, credentials.Login, credentials.Password))
             {
                 web.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", authToken);
@@ -268,7 +268,7 @@ namespace Lpp.Dns.Portal.Areas.Controls.Controllers
         {
             List<Lpp.Dns.DTO.ExtendedDocumentDTO> documents = new List<Lpp.Dns.DTO.ExtendedDocumentDTO>();
 
-            using (var web = new System.Net.Http.HttpClient())
+            using (var web = new System.Net.Http.HttpClient() { Timeout = TimeSpan.FromMinutes(30) })
             using (var sftp = new SftpClient(credentials.Address, credentials.Port, credentials.Login, credentials.Password))
             {
                 web.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", authToken);

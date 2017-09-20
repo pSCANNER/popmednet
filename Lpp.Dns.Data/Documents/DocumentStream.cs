@@ -193,7 +193,7 @@ namespace Lpp.Dns.Data.Documents
                         (SqlConnection) context.Database.Connection))
             {
 
-                cmd.Parameters.Add("@data", SqlDbType.Binary, -1).Value = buffer.Skip(offset).Take(count);
+                cmd.Parameters.Add("@data", SqlDbType.VarBinary, -1).Value = buffer.Skip(offset).Take(count);
                 cmd.Parameters.AddWithValue("id", documentID);
 
                 try
@@ -221,7 +221,7 @@ namespace Lpp.Dns.Data.Documents
                 (SqlConnection) context.Database.Connection))
             {
 
-                cmd.Parameters.Add("@data", SqlDbType.Binary, -1).Value = stream;
+                cmd.Parameters.Add("@data", SqlDbType.VarBinary, -1).Value = stream;
                 cmd.Parameters.AddWithValue("id", documentID);
 
                 try
@@ -252,7 +252,7 @@ namespace Lpp.Dns.Data.Documents
                         (SqlConnection) context.Database.Connection))
             {
 
-                cmd.Parameters.Add("@data", SqlDbType.Binary, -1).Value = stream;
+                cmd.Parameters.Add("@data", SqlDbType.VarBinary, -1).Value = stream;
                 cmd.Parameters.AddWithValue("id", documentID);
 
                 try

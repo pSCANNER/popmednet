@@ -26,6 +26,7 @@
     <TargetFrameworkProfile />
     <TypeScriptToolsVersion>2.1</TypeScriptToolsVersion>
     <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +44,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <FilesToIncludeForPublish>OnlyFilesToRunTheApp</FilesToIncludeForPublish>
+    <ExcludeGeneratedDebugSymbol>true</ExcludeGeneratedDebugSymbol>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
@@ -1735,7 +1738,6 @@
     <Content Include="Images\Approve16.png" />
     <Content Include="Images\Approve24.png" />
     <Content Include="Images\Approve32.png" />
-    
     <Content Include="Images\Collapse16.png" />
     <Content Include="Images\Connect16.png" />
     <Content Include="Images\Connect24.png" />
@@ -2119,6 +2121,7 @@
     <Content Include="Content\kendo\2017.1.118\kendo.silver.mobile.min.css.map" />
     <Content Include="Content\kendo\2017.1.118\kendo.uniform.min.css.map" />
     <Content Include="Content\kendo\2017.1.118\kendo.uniform.mobile.min.css.map" />
+    <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Scripts\jquery\2.1.4\jquery-2.1.4.intellisense.js" />
     <Content Include="Scripts\jquery.cookie\1.4.1\jquery.cookie-1.4.1.min.js" />
     <Content Include="Scripts\jquery.cookie\1.4.1\jquery.cookie.js" />
@@ -7482,6 +7485,7 @@
     </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -7582,5 +7586,4 @@
     <TypeScriptIncludeComments>false</TypeScriptIncludeComments>
     <TypeScriptSourceMap>false</TypeScriptSourceMap>
   </PropertyGroup>
-  
 </Project>

@@ -15,6 +15,7 @@ using System.Net.Http;
 using System.Security;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Data.SqlTypes;
 
 namespace Lpp.Dns.Api.Documents
 {
@@ -417,7 +418,16 @@ namespace Lpp.Dns.Api.Documents
 
             using (var dbStream = new Dns.Data.Documents.DocumentStream(DataContext, document.ID))
             {
-                await stream.CopyToAsync(dbStream);
+                long bufferSize = stream.Length;
+                if (stream.Length >= 52428800)
+                {
+                    bufferSize = 52428800;
+                }
+                else if (stream.Length < 81920)
+                {
+                    bufferSize = 81920;
+                }
+                await stream.CopyToAsync(dbStream, Convert.ToInt32(bufferSize));
             }
 
             if (!string.IsNullOrWhiteSpace(comments))

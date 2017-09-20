@@ -20,8 +20,31 @@
     <TypeScriptToolsVersion>2.1</TypeScriptToolsVersion>
     <UseGlobalApplicationHostFile />
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <FilesToIncludeForPublish>OnlyFilesToRunTheApp</FilesToIncludeForPublish>
+  </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <ItemGroup><Reference Include="Lpp.WorkFlow.Engine, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL"><SpecificVersion>False</SpecificVersion><HintPath>..\Dependencies\Lpp.WorkFlow.Engine.dll</HintPath></Reference><Reference Include="Lpp.Utilities, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL"><SpecificVersion>False</SpecificVersion><HintPath>..\Dependencies\Lpp.Utilities.dll</HintPath></Reference><Reference Include="Lpp.Utilities.WebSites, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL"><SpecificVersion>False</SpecificVersion><HintPath>..\Dependencies\Lpp.Utilities.WebSites.dll</HintPath></Reference><Reference Include="Lpp.QueryComposer, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL"><SpecificVersion>False</SpecificVersion><HintPath>..\Dependencies\Lpp.QueryComposer.dll</HintPath></Reference><Reference Include="Lpp.Objects, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL"><SpecificVersion>False</SpecificVersion><HintPath>..\Dependencies\Lpp.Objects.dll</HintPath></Reference>
+  <ItemGroup>
+    <Reference Include="Lpp.WorkFlow.Engine, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Lpp.WorkFlow.Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="Lpp.Utilities, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Lpp.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Lpp.Utilities.WebSites, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Lpp.Utilities.WebSites.dll</HintPath>
+    </Reference>
+    <Reference Include="Lpp.QueryComposer, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Lpp.QueryComposer.dll</HintPath>
+    </Reference>
+    <Reference Include="Lpp.Objects, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Lpp.Objects.dll</HintPath>
+    </Reference>
     <Reference Include="Antlr3.Runtime">
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
@@ -711,6 +734,7 @@
     <Content Include="Areas\QueryComposer\Views\Terms\SqlDistribution\Edit.cshtml" />
     <Content Include="Areas\QueryComposer\Views\Terms\SqlDistribution\View.cshtml" />
     <Content Include="Areas\Workflow\Views\Requests\ResponseContainer.cshtml" />
+    <Content Include="bin\Lpp.Dns.DTO.xml" />
     <Content Include="Content\DataChecker\Responses.css" />
     <Content Include="Content\DataChecker\Responses.External.css" />
     <Content Include="Content\Site.css" />
@@ -1030,6 +1054,7 @@
     <Content Include="Areas\QueryComposer\Views\Terms\ProcedureCodes\EditStratifierView.cshtml" />
     <Content Include="Areas\QueryComposer\Views\Terms\ProcedureCodes\StratifierView.cshtml" />
     <Content Include="Areas\QueryComposer\Views\Terms\ProcedureCodes\View.cshtml" />
+    <Content Include="ConnectionStrings.config" />
     <None Include="Content\ChildSelectDialog.css.map">
       <DependentUpon>ChildSelectDialog.css</DependentUpon>
     </None>
@@ -1134,6 +1159,7 @@
     <Content Include="Views\DataMarts\Details.cshtml" />
     <Content Include="Views\Projects\Index.cshtml" />
     <Content Include="Views\Groups\Index.cshtml" />
+    <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Views\QlikTest\DivIntegration.cshtml" />
     <None Include="Views\QlikTest\Index.cshtml" />
     <None Include="Views\QlikTest\Qlik ReadMe.txt" />
@@ -1744,11 +1770,6 @@
       <Project>{76FFE23E-47D1-46B6-8EC3-6554361FBFB0}</Project>
       <Name>Lpp.Utilities.Legacy</Name>
     </ProjectReference>
-    
-    
-    
-    
-    
     <ProjectReference Include="..\Plugins\Lpp.Dns.General.CriteriaGroupCommon\Lpp.Dns.General.CriteriaGroupCommon.csproj">
       <Project>{a7557304-001b-4cae-a05f-196bff7dbaeb}</Project>
       <Name>Lpp.Dns.General.CriteriaGroupCommon</Name>

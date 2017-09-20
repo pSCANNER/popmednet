@@ -117,13 +117,11 @@ namespace Lpp.Dns.Api
 
         }
 
-#if(!DEBUG)
         void WebApiApplication_Error(object sender, EventArgs e)
         {
             var error = Server.GetLastError();
             //Log errors here
         }
-#endif
 
         private static bool ValidateRemoteCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors policyErrors)
         {

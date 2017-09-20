@@ -727,7 +727,9 @@ namespace Lpp.Dns.Api.DataMartClient
 
                     ms.Position = 0;
 
-                    await documentStream.WriteStreamAsync(ms);
+                    //await documentStream.WriteStreamAsync(ms);
+                    details.Document.SetData(DataContext, b);
+                    DataContext.SaveChanges();
 
                     if (details.ProcessModularProgramSearchTerms && ms.Length > 0)
                     {

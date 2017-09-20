@@ -33,7 +33,7 @@ namespace Lpp.Dns.Portal.Root
             XmlConfigurator.Configure();
             AreaRegistration.RegisterAllAreas();
 
-#if !DEBUG 
+#if false 
             Aspose.Cells.License lic = new Aspose.Cells.License();
             lic.SetLicense(Server.MapPath("Aspose.Cells.lic"));
 #endif
@@ -84,6 +84,20 @@ namespace Lpp.Dns.Portal.Root
 
         }
 
+        protected void Application_Error(object sender, EventArgs e)
+        {
+#if DEBUG
+            Exception exc = Server.GetLastError();
+            string errorMessage = "\r\n";
+            errorMessage += "URL: " + HttpContext.Current.Request.Url + "\r\n";
+            errorMessage += "Path: " + HttpContext.Current.Request.FilePath + "\r\n";
+            errorMessage += "Message: " + exc.Message + "\r\n";
+            errorMessage += "StackTrace: " + exc.StackTrace + "\r\n";
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
+            Server.ClearError();
+#endif
+        }
+
 
         class LoggerExport
         {
@@ -113,7 +127,7 @@ namespace Lpp.Dns.Portal.Root
         //    }
         //}
 
-        #region Tracing DbProvider
+#region Tracing DbProvider
 #if DEBUG
         public class TracingDbProvider : DbProviderFactory, IServiceProvider
         {
@@ -293,7 +307,7 @@ namespace Lpp.Dns.Portal.Root
             }
         }
 #endif
-        #endregion
+#endregion
 
     }
 }
