@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using pSCANNER.DataMart.Model.processor.Analysis;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Test.Lpp.pScanner.DataMart.Model.Processors;
 
@@ -27,11 +28,54 @@ namespace NUnit.Lpp.pScanner.DataMart.Model.Processors.Processor {
             _requestMetadata = new RequestMetadata {
                 RequestTypeId = Guid.Empty.ToString()
             };
-            _requestDocuments = new Document[] {
+            _requestAnalyticDocuments = new Document[] {
                 new Document("1", "json", "dataset.json"),
                 new Document("2", "json", "parameters.json"),
                 new Document("3", "json", "pmml.json")
             };
+        }
+
+        /// <summary>
+        ///     Requests the documents empty test.
+        /// </summary>
+        //[Test]
+        public void Request_Documents_Empty_Test() {
+            Assert.That(() => _processor.Request(RequestId, _network, _requestMetadata, null, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("Document[]"));
+            Assert.That(() => _processor.Request(RequestId, _network, _requestMetadata, new Document[] { }, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("Document[]"));
+        }
+
+        /// <summary>
+        ///     Requests the network connection metadata empty test.
+        /// </summary>
+        //[Test]
+        public void Request_NetworkConnectionMetadata_Empty_Test() {
+            Assert.That(() => _processor.Request(RequestId, null, _requestMetadata, _requestAnalyticDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("NetworkConnectionMetadata"));
+        }
+
+        /// <summary>
+        ///     Requests the request identifier empty test.
+        /// </summary>
+        //[Test]
+        public void Request_RequestId_Empty_Test() {
+            Assert.That(() => _processor.Request(null, _network, _requestMetadata, _requestAnalyticDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("RequestId"));
+            Assert.That(() => _processor.Request(string.Empty, _network, _requestMetadata, _requestAnalyticDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("RequestId"));
+            Assert.That(() => _processor.Request("", _network, _requestMetadata, _requestAnalyticDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("RequestId"));
+        }
+
+        /// <summary>
+        ///     Requests the request metadata empty test.
+        /// </summary>
+        //[Test]
+        public void Request_RequestMetadata_Empty_Test() {
+            Assert.That(() => _processor.Request(RequestId, _network, null, _requestAnalyticDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments), Throws.Exception.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("RequestMetadata"));
+        }
+
+        /// <summary>
+        ///     Requests the test.
+        /// </summary>
+        //[Test]
+        public void Request_Test() {
+            _processor.Request(RequestId, _network, _requestMetadata, _requestAnalyticDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments);
         }
 
         //[Test]
@@ -96,7 +140,7 @@ namespace NUnit.Lpp.pScanner.DataMart.Model.Processors.Processor {
         /// <summary>
         ///     The request documents
         /// </summary>
-        protected Document[] _requestDocuments;
+        protected Document[] _requestAnalyticDocuments;
 
         /// <summary>
         ///     The request metadata

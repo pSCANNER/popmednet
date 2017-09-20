@@ -101,6 +101,15 @@
     <Content Include="Common\scanner\protocol\translation-omop2\parameters-ui.txt" />
     <Content Include="Common\scanner\protocol\translation-omop2\pmml.txt" />
     <Content Include="Common\scanner\result-release-names.txt" />
+    <None Include="Common\scanner\test_files\test_dataset.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Common\scanner\test_files\test_parameters.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Common\scanner\test_files\test_pmml.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
