@@ -109,33 +109,14 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         /// <returns></returns>
         /// <exception cref="NullReferenceException"></exception>
         public override ResponseBase DoPostRequest(BaseRequestParameter parameter) {
-            BaseAdapter adapter;
-            BaseRequestParameter adapterParameter;
-
             var combinedJson = combineJsonDocs((IUserJsonInputParameter)parameter);
 
-            //if (parameter is AnalysticsRequestParameter) {
-            //    var xmlPmmlRequest = convertJsonPmmlToXmlPmml(combinedJson);
-            //    var requestUriString = string.Format("{0}/{1}?{2}={3}&{4}={5}", ((AnalysticsRequestParameter)parameter).ServiceUrl, BaseRequestParameter.RequestForEnum.PostRequest, BaseRequestParameter.RequestForEnum.RequestId, parameter.RequestId, BaseRequestParameter.RequestForEnum.RequestXml, xmlPmmlRequest);
-            //    adapter = new WebAdapter();
-            //    adapterParameter = new WebServiceRequestParameter(requestUriString, parameter.RequestId);
-            //} else if (parameter is AggregatorClientRequestParameter) {
-            //    adapter = initializeAdapter(parameter, combinedJson, out adapterParameter);
-            //} else {
-            //    throw new NullReferenceException(string.Format("Do not know how to handle {0}", parameter.GetType()));
-            //}
-
-            adapter = initializeAdapter(parameter, combinedJson, out adapterParameter);
-
-            /*
-             * Request
-             * Type: get
-             */
-
-            // RequestId= RequestXml= <-- UUEncoded
+            BaseAdapter adapter = initializeAdapter(parameter, combinedJson, out BaseRequestParameter adapterParameter);
 
             var response = adapter.PerformRequest(adapterParameter);
+
             response.Status = Constants.ResponseStatus.Complete;
+
             return response;
         }
 
@@ -187,24 +168,24 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
             status = status.ToLower();
             switch (status) {
                 case Constants.Processor.Output.WebAdapter.complete: {
-                        retVal = Constants.ResponseStatus.Complete;
-                        break;
-                    }
+                    retVal = Constants.ResponseStatus.Complete;
+                    break;
+                }
                 case Constants.Processor.Output.WebAdapter.inprogress: {
-                        retVal = Constants.ResponseStatus.InProgress;
-                        break;
-                    }
+                    retVal = Constants.ResponseStatus.InProgress;
+                    break;
+                }
                 case Constants.Processor.Output.WebAdapter.canceled: {
-                        retVal = Constants.ResponseStatus.Canceled;
-                        break;
-                    }
+                    retVal = Constants.ResponseStatus.Canceled;
+                    break;
+                }
                 case Constants.Processor.Output.WebAdapter.error: {
-                        retVal = Constants.ResponseStatus.Error;
-                        break;
-                    }
+                    retVal = Constants.ResponseStatus.Error;
+                    break;
+                }
                 default: {
-                        break;
-                    }
+                    break;
+                }
             }
             return retVal;
         }
@@ -363,8 +344,6 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
                     pmml.AddLine(@"<PMML version=""4.2"" xmlns=""http://www.dmg.org/PMML-4_2"">");
                     pmml.AddLine(@"<Header copyright=""Copyright (c) 2015 user"" description=""Generalized Linear Regression Model"">");
 
-                    pmml.AddLine(string.Format(@"<Extension name=""convergence"">{0}</Extension>", model.ConvergenceWarning.GetPmmlValue()));
-                    pmml.AddLine(string.Format(@"<Extension name=""errorGradient"">{0}</Extension>", model.ErrorGradient.GetPmmlValue()));
                     pmml.AddLine(@"<Application name=""pScannerAggregatorClient"" version=""0.1""></Application>");
                     pmml.AddLine(@"<Timestamp>2015-04-21 12:54:37</Timestamp>");
                     pmml.AddLine(@"</Header>");
@@ -521,7 +500,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
 
                     var ppMatrix = currentItem[Constants.Pmml.Tags.PMML.GeneralRegressionModel.PPMatrix.TagName];
                     var paramMatrix = currentItem[Constants.Pmml.Tags.PMML.GeneralRegressionModel.ParamMatrix.TagName];
-                    var requestParameterList = currentItem[Constants.Pmml.Tags.PMML.GeneralRegressionModel.RequestParameterList.TagName];
+                    var requestParameterList = currentItem[Constants.Pmml.Tags.PMML.GeneralRegressionModel.RequestParameterListConst.TagName];
 
                     var parameterName = string.Format("p{0}", index);
                     var predictorName = namespacePieces.Last();
@@ -546,22 +525,22 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
                         case Constants.Pmml.Tags.PMML.GeneralRegressionModel.MiningField.target:
                         case Constants.Pmml.Tags.PMML.GeneralRegressionModel.MiningField.predicted:
                         case Constants.Pmml.Tags.PMML.GeneralRegressionModel.MiningField.active: {
-                                JArray jsonItems;
+                            JArray jsonItems;
 
-                                if ((x.Value is JArray) == false) {
-                                    jsonItems = new JArray { x.Value };
-                                } else {
-                                    jsonItems = ((JArray)x.Value);
-                                }
+                            if ((x.Value is JArray) == false) {
+                                jsonItems = new JArray { x.Value };
+                            } else {
+                                jsonItems = ((JArray)x.Value);
+                            }
 
-                                foreach (var item in jsonItems) {
-                                    var newObject = new JObject { { "usageType", name }, { "name", item } };
-                                    ((JArray)parentItem).Add(newObject);
-                                }
+                            foreach (var item in jsonItems) {
+                                var newObject = new JObject { { "usageType", name }, { "name", item } };
+                                ((JArray)parentItem).Add(newObject);
+                            }
                             ;
 
-                                break;
-                            }
+                            break;
+                        }
 
                         // case Constants.Pmml.Tags.PMML.GeneralRegressionModel.MiningField.active: { var jsonItems = ((JArray) x.Value);
 
@@ -575,30 +554,30 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
                         case Constants.Pmml.Tags.PMML.Header.Extension.Type:
                         case Constants.Pmml.Tags.PMML.Header.Extension.DataSetName:
                         case Constants.Pmml.Tags.PMML.Header.Extension.DataSetSchemaVersion: {
-                                var jsonItems = (x.Value);
+                            var jsonItems = (x.Value);
 
-                                var newObject = new JObject { { "name", name }, { "value", jsonItems.ToString() } };
-                                ((JArray)parentItem).Add(newObject);
+                            var newObject = new JObject { { "name", name }, { "value", jsonItems.ToString() } };
+                            ((JArray)parentItem).Add(newObject);
 
-                                break;
-                            }
+                            break;
+                        }
 
-                        case Constants.Pmml.Tags.PMML.GeneralRegressionModel.RequestParameterList.TagName:
+                        case Constants.Pmml.Tags.PMML.GeneralRegressionModel.RequestParameterListConst.TagName:
                         case Constants.Pmml.Tags.PMML.GeneralRegressionModel.CovariateList.TagName:
                         case Constants.Pmml.Tags.PMML.GeneralRegressionModel.FactorList.TagName: {
-                                var jsonItems = ((JArray)x.Value);
-                                foreach (var activeItem in jsonItems) {
-                                    ((JArray)currentItem).Add(activeItem);
-                                }
-                                break;
+                            var jsonItems = ((JArray)x.Value);
+                            foreach (var activeItem in jsonItems) {
+                                ((JArray)currentItem).Add(activeItem);
                             }
+                            break;
+                        }
                         default: {
-                                if (currentItem != null) {
-                                    var jValue = ((JValue)currentItem);
-                                    jValue.Value = x.Value.ToString();
-                                }
-                                break;
+                            if (currentItem != null) {
+                                var jValue = ((JValue)currentItem);
+                                jValue.Value = x.Value.ToString();
                             }
+                            break;
+                        }
                     }
                 }
             }

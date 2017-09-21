@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
-using Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.Configuration;
 using pSCANNER.DataMart.Model.processor.DataSetMapping.Configuration;
 
 namespace Lpp.Scanner.DataMart.Model.Processors.DataSetMapping {
+
+    public enum TypeIs {
+        Aggregator,
+        Analytics
+    }
 
     /// <summary>
     /// </summary>
@@ -18,6 +22,6 @@ namespace Lpp.Scanner.DataMart.Model.Processors.DataSetMapping {
         ///     Gets the r section.
         /// </summary>
         /// <returns></returns>
-        string getRSection();
+        string getRSection(TypeIs typeIs);
     }
 }

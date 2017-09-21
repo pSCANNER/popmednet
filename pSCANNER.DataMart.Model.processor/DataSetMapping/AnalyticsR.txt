@@ -1,0 +1,20 @@
+﻿ String connectionString = data.getUrl();
+
+rLibs.add("RODBC");
+rLines.add(String.format("conn <- odbcDriverConnect('%s", connectionString));
+//Query=SELECT * FROM [dbo].[MTE_DataSet_USC]
+int indexOf = connectionString.toLowerCase().indexOf("query=");
+String substring = connectionString.substring(indexOf + "Query=".length(), connectionString.length()-1);
+rLines.add(String.format("%s <- sqlQuery(conn, \"%s\")", DataObjectVariableName, substring));
+rLines.add("odbcClose(conn)");
+
+return retVal;
+
+    rLines.add(String.format("%s <- read.csv(\"%s\")", DataObjectVariableName, replacedText));
+
+
+
+
+confint(glmObj)
+String.format("glmObj <- glm(%s ~ %s, data=%s, family=\"%s\")", dependentVar, independentVars, DataObjectVariableName, family)
+String.format("glmObj <- glm(%s ~ %s, data=%s)", dependentVar, independentVars, DataObjectVariableName)

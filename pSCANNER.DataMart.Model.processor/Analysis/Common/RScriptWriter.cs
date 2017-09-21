@@ -25,6 +25,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using Lpp.Scanner.DataMart.Model.Processors.Common.Pmml;
 
 #endregion Using
 
@@ -39,19 +40,16 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         /// <returns></returns>
         /// <exception cref="System.Exception"></exception>
         public static string GenerateRScript(AggregatorClientRequestParameter parameter) {
+            string ret_val = string.Empty;
+
+            GlmParameters parameters = glmHeader(parameter);
+
             var ppMatrix = parameter.Pmml.GetPPMatrix();
             var paramMatrix = parameter.Pmml.GetParamMatrix();
-            var requestParameterList = parameter.Pmml.GetRequestParameterList();
-            var requestParameters = new RequestParameterList { Parameters = requestParameterList.RequestParameters };
-            var linkFunction = parameter.Pmml.GetLinkFunction(LocalConstants.LinkFunctionName.GetValue());
-            var family = parameter.Pmml.GetFamily(LocalConstants.FamilyName.GetValue());
-            var result = paramMatrix.PCells.Select(x => new { Key = requestParameters.Parameters[x.Key], x.Value }).ToDictionary(x => x.Key, x => x.Value);
-            var miningFields = new MiningFields { DependantVariable = parameter.Pmml.GetMiningSchema().DependentVariable, IndependantVariables = parameter.Pmml.GetMiningSchema().IndependantVariables };
-            var independentVariables = miningFields.IndependantVariables.Select(x => String.Format(@"""{0}""", x)).ToArray();
-
-            var ppCell = ppMatrix.PPCells.First(x => x.Value.PredictorName == miningFields.DependantVariable);
-            var pCells = result.Values.Join(requestParameters.Parameters, cell => cell.ParameterName, x => x.Key, (cell, pair) => cell);
-            var t = miningFields.IndependantVariables.ToDictionary(x => x, x => x);
+            var result = paramMatrix.PCells.Select(x => new { Key = parameters.RequestParameters.Parameters[x.Key], x.Value }).ToDictionary(x => x.Key, x => x.Value);
+            var ppCell = ppMatrix.PPCells.First(x => x.Value.PredictorName == parameters.MiningFields.DependantVariable);
+            var pCells = result.Values.Join(parameters.RequestParameters.Parameters, cell => cell.ParameterName, x => x.Key, (cell, pair) => cell);
+            var t = parameters.MiningFields.IndependantVariables.ToDictionary(x => x, x => x);
             var enumerable = pCells.Where(x => x.ParameterName != ppCell.Value.ParameterName).ToList();
             foreach (var pCell in enumerable.Join(ppMatrix.PPCells, cell => cell.ParameterName, pair => pair.Value.ParameterName, (cell, pair) => new { cell, pair }).ToArray()) {
                 if (pCell.pair.Value.PredictorName != VariableConstants.InterceptConst) {
@@ -63,23 +61,34 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
 
             var coefficientValues = String.Join(", ", enumerable.OrderBy(x => x.ParameterName).Select(x => x.Value.ToString()));
 
-            IRegistry registry = new PSCANNERRegistry();
-            var rSection = registry.getRSection();
+            ret_val = BuildScript(parameter, parameters.Family, parameters.MiningFields, parameters.IndependentVariables, coefficientValues);
 
-            rSection = HttpUtility.HtmlDecode(rSection);
-
-            return BuildScript(parameter, family, miningFields, independentVariables, coefficientValues, rSection);
+            return ret_val;
         }
 
         internal static string GenerateRScript(AnalysticsRequestParameter parameter) {
             string ret_val = string.Empty;
-            var requestParameterList = parameter.Pmml.GetRequestParameterList();
-            var requestParameters = new RequestParameterList { Parameters = requestParameterList.RequestParameters };
-            var linkFunction = parameter.Pmml.GetLinkFunction(LocalConstants.LinkFunctionName.GetValue());
-            var family = parameter.Pmml.GetFamily(LocalConstants.FamilyName.GetValue());
-            var miningFields = new MiningFields { DependantVariable = parameter.Pmml.GetMiningSchema().DependentVariable, IndependantVariables = parameter.Pmml.GetMiningSchema().IndependantVariables };
-            var independentVariables = miningFields.IndependantVariables.Select(x => String.Format(@"""{0}""", x)).ToArray();
+            GlmParameters parameters = glmHeader(parameter);
+            ret_val = BuildScript(parameter, parameters.Family, parameters.MiningFields, parameters.IndependentVariables);
             return ret_val;
+        }
+
+        private static string BuildScript(AnalysticsRequestParameter parameter, string family, MiningFields miningFields, string[] independentVariables) {
+            IRegistry registry = new pSCANNER_R_Registry();
+            var rSection = registry.getRSection(TypeIs.Analytics);
+
+            rSection = HttpUtility.HtmlDecode(rSection);
+
+            var rScriptBuilder = new RScriptBuilder("Analytics - Site Code");
+            string script = @"
+
+            confint(glmObj)
+            glmObj <- glm(%s ~ %s, data=%s, family='%s')
+            paste(capture.output({pmml(glmObj, copyright='DAN')}), collapse='\\n')
+            paste(capture.output({%s}), collapse='\\n')
+            ";
+
+            return rScriptBuilder.Text;
         }
 
         /// <summary>
@@ -90,9 +99,13 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
         /// <param name="miningFields">The mining fields.</param>
         /// <param name="independentVariables">The independent variables.</param>
         /// <param name="coefficientValues">The coefficient values.</param>
-        /// <param name="rSection">The r section.</param>
         /// <returns></returns>
-        private static string BuildScript(AggregatorClientRequestParameter parameter, string family, MiningFields miningFields, string[] independentVariables, string coefficientValues, string rSection) {
+        private static string BuildScript(AggregatorClientRequestParameter parameter, string family, MiningFields miningFields, string[] independentVariables, string coefficientValues) {
+            IRegistry registry = new pSCANNER_R_Registry();
+            var rSection = registry.getRSection(TypeIs.Aggregator);
+
+            rSection = HttpUtility.HtmlDecode(rSection);
+
             var rScriptBuilder = new RScriptBuilder("Aggregator - Site Code");
 
             rScriptBuilder.AddLine(@"{0} <- ""{1}""", LocalConstants.FamilyName, family);
@@ -154,37 +167,89 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis.Common {
 
             switch (connectAs) {
                 case ConnectAs.HTTP: {
-                        readString = string.Format("{1} <- as.matrix(read.csv(\"{0}\"))", connection.Uri, LocalConstants.DataSet);
-                        break;
-                    }
+                    readString = string.Format("{1} <- as.matrix(read.csv(\"{0}\"))", connection.Uri, LocalConstants.DataSet);
+                    break;
+                }
                 case ConnectAs.SqlDataBase: {
-                        var sb = new StringBuilder();
-                        sb.AppendLine("# BEGIN Database Read");
-                        sb.AppendLine("if (!require(\"RODBC\")) {");
-                        sb.AppendLine("install.packages(\"RODBC\", repos=\"http://cran.rstudio.com/\", dependencies=TRUE);");
-                        sb.AppendLine("library(RODBC);");
-                        sb.AppendLine("}");
-                        sb.AppendLine("");
-                        var connectionString = connection.Uri;
+                    var sb = new StringBuilder();
+                    sb.AppendLine("# BEGIN Database Read");
+                    sb.AppendLine("if (!require(\"RODBC\")) {");
+                    sb.AppendLine("install.packages(\"RODBC\", repos=\"http://cran.rstudio.com/\", dependencies=TRUE);");
+                    sb.AppendLine("library(RODBC);");
+                    sb.AppendLine("}");
+                    sb.AppendLine("");
+                    var connectionString = connection.Uri;
 
-                        var match = _queryMatch.Match(connectionString);
-                        if (match.Success) {
-                            var query = match.Groups["query"].Captures[0].Value;
-                            sb.AppendLine(string.Format("dbhandle <- odbcDriverConnect(\'driver={{SQL Server}};{0}\')", connectionString));
-                            sb.AppendLine(string.Format("{0} <- sqlQuery(dbhandle, \'{1}\')", LocalConstants.DataSet, query));
-                        }
-
-                        sb.AppendLine("# END Database Read");
-                        readString = sb.ToString();
-                        break;
+                    var match = _queryMatch.Match(connectionString);
+                    if (match.Success) {
+                        var query = match.Groups["query"].Captures[0].Value;
+                        sb.AppendLine(string.Format("dbhandle <- odbcDriverConnect(\'driver={{SQL Server}};{0}\')", connectionString));
+                        sb.AppendLine(string.Format("{0} <- sqlQuery(dbhandle, \'{1}\')", LocalConstants.DataSet, query));
                     }
+
+                    sb.AppendLine("# END Database Read");
+                    readString = sb.ToString();
+                    break;
+                }
                 default: {
-                        throw new UnexpectedSwitchValue(type.Name);
-                    }
+                    throw new UnexpectedSwitchValue(type.Name);
+                }
             }
             return readString;
         }
 
+        private static GlmParameters glmHeader(IRExecution parameter) {
+            GlmParameters parameters = null;
+            parameters.RequestParameterList = parameter.Pmml.GetRequestParameterList();
+            parameters.RequestParameters = new RequestParameterList { Parameters = parameters.RequestParameterList.RequestParameters };
+            parameters.LinkFunction = parameter.Pmml.GetLinkFunction(LocalConstants.LinkFunctionName.GetValue());
+            parameters.Family = parameter.Pmml.GetFamily(LocalConstants.FamilyName.GetValue());
+            parameters.MiningFields = new MiningFields { DependantVariable = parameter.Pmml.GetMiningSchema().DependentVariable, IndependantVariables = parameter.Pmml.GetMiningSchema().IndependantVariables };
+            parameters.IndependentVariables = parameters.MiningFields.IndependantVariables.Select(x => String.Format(@"""{0}""", x)).ToArray();
+            return parameters;
+        }
+
         private static readonly Regex _queryMatch = new Regex(@"Query=(?<query>[\p{L}\s\*\[\]\._\d]+)(?:;|$)", RegexOptions.Compiled);
+
+        /// <summary>
+        /// </summary>
+        private class GlmParameters {
+
+            /// <summary>
+            ///     Gets or sets the family.
+            /// </summary>
+            /// <value>The family.</value>
+            public string Family { get; internal set; }
+
+            /// <summary>
+            ///     Gets or sets the independent variables.
+            /// </summary>
+            /// <value>The independent variables.</value>
+            public string[] IndependentVariables { get; internal set; }
+
+            /// <summary>
+            ///     Gets or sets the link function.
+            /// </summary>
+            /// <value>The link function.</value>
+            public string LinkFunction { get; internal set; }
+
+            /// <summary>
+            ///     Gets or sets the mining fields.
+            /// </summary>
+            /// <value>The mining fields.</value>
+            public MiningFields MiningFields { get; internal set; }
+
+            /// <summary>
+            ///     Gets or sets the request parameter list.
+            /// </summary>
+            /// <value>The request parameter list.</value>
+            public PmmlRequestParameterList RequestParameterList { get; internal set; }
+
+            /// <summary>
+            ///     Gets or sets the request parameters.
+            /// </summary>
+            /// <value>The request parameters.</value>
+            public RequestParameterList RequestParameters { get; internal set; }
+        }
     }
 }
