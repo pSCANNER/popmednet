@@ -1,0 +1,50 @@
+﻿{
+  "PMML": {
+    "xmlns": "http://www.dmg.org/PMML-4_2",
+    "Header": {
+      "Extension": [
+        {
+          "extender": "Rattle/PMML",
+          "name": "user",
+          "value": "user"
+        },
+        {
+          "name": "DataDictionarySchema",
+          "value": "ABC"
+        },
+        {
+          "name": "DataDictionarySchemaVersion",
+          "value": "1.0"
+        },
+        {
+          "name": "ExternalReference",
+          "value": ""
+        }
+      ],
+      "copyright": "Copyright (c) 2015 user",
+      "description": "Generalized Linear Regression Model",
+      "Application": {
+        "name": "Rattle/PMML",
+        "version": 1.4
+      },
+      "Timestamp": "2015-04-21 12:54:37"
+    },
+    "GeneralRegressionModel": {
+      "modelName": "",
+      "linkFunction": "",
+      "MiningSchema": {
+        "MiningField": []
+      },
+      "functionName": "",
+      "modelType": "",
+      "distribution": "",
+      "algorithmName": "",
+      "RequestParameterList": [],
+      "FactorList": [],
+      "CovariateList": [],
+      "PPMatrix": [],
+      "ParamMatrix": []
+    },
+    "version": 4.2
+  }
+}

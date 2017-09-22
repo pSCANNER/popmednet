@@ -14,13 +14,17 @@
 
 using Lpp.Scanner.DataMart.Model.Processors.Common.Base;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Pmml;
-using Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.Configuration;
+
 using pSCANNER.DataMart.Model.processor.DataSetMapping.Configuration;
 
 #endregion Using
 
 namespace Lpp.Scanner.DataMart.Model.Processors.Common.Parameters {
 
+    /// <summary>
+    /// </summary>
+    /// <seealso cref="Lpp.Scanner.DataMart.Model.Processors.Common.Base.BaseProxyRequestParameter"/>
+    /// <seealso cref="Lpp.Scanner.DataMart.Model.Processors.Common.Parameters.IRExecution"/>
     public class AnalysticsRequestParameter : BaseProxyRequestParameter, IRExecution {
 
         #region Constructors
@@ -43,11 +47,26 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Parameters {
 
         #region Properties
 
-        public void SetPmmlDocument(string pmml) => throw new System.NotImplementedException();
+        /// <summary>
+        ///     Sets the PMML document.
+        /// </summary>
+        /// <param name="pmml">The PMML.</param>
+        public void SetPmmlDocument(string pmml) {
+            Pmml = PmmlParser.GetFromXmlString(pmml);
+        }
 
+        /// <summary>
+        ///     Gets the execution path.
+        /// </summary>
+        /// <value>The execution path.</value>
+        /// <exception cref="System.NotImplementedException"></exception>
         public string ExecutionPath => throw new System.NotImplementedException();
 
-        public PmmlDocument Pmml { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        /// <summary>
+        ///     Gets or sets the PMML.
+        /// </summary>
+        /// <value>The PMML.</value>
+        public PmmlDocument Pmml { get; set; }
 
         /// <summary>
         ///     Gets the service URL.

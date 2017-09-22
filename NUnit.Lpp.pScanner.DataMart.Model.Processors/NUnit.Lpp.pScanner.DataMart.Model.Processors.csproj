@@ -44,14 +44,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aggregator\TestScannerAnalysisModelAggregator.cs" />
+    <Compile Include="Aggregator\TestScannerAnalysisModelAggregatorBase.cs" />
     <Compile Include="Processor\TestScannerAnalysisModelProcessor.cs" />
     <Compile Include="Processor\TestScannerAnalysisModelProcessorBase.cs" />
-    <Compile Include="TestClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Common\scanner\test_files\binary.csv" />
+    <EmbeddedResource Include="Common\scanner\aggregation\test_files\test_parameters.json" />
+    <EmbeddedResource Include="Common\scanner\aggregation\test_files\test_pmml.json" />
+    <None Include="Common\scanner\analytics\test_files\binary.csv" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -100,9 +102,9 @@
     <Content Include="Common\scanner\protocol\translation-omop2\parameters-ui.txt" />
     <Content Include="Common\scanner\protocol\translation-omop2\pmml.txt" />
     <Content Include="Common\scanner\result-release-names.txt" />
-    <EmbeddedResource Include="Common\scanner\test_files\test_dataset.json" />
-    <EmbeddedResource Include="Common\scanner\test_files\test_parameters.json" />
-    <EmbeddedResource Include="Common\scanner\test_files\test_pmml.json" />
+    <EmbeddedResource Include="Common\scanner\analytics\test_files\test_dataset.json" />
+    <EmbeddedResource Include="Common\scanner\analytics\test_files\test_parameters.json" />
+    <EmbeddedResource Include="Common\scanner\analytics\test_files\test_pmml.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

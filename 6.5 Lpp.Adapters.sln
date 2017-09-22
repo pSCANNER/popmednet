@@ -73,9 +73,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lpp.pScanner.DataMart.Model.Processors", "pSCANNER.DataMart.Model.processor\Lpp.pScanner.DataMart.Model.Processors.csproj", "{B5A7864F-AA68-4022-9E85-766CAFD3A4D5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pScanner", "pScanner", "{1DF3DCFC-2C1A-487E-85D1-393E41644524}"
-	ProjectSection(SolutionItems) = preProject
-		pSCANNER.testsettings = pSCANNER.testsettings
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lpp.Dns.DTO.Scanner", "Lpp.Dns.DTO.Scanner\Lpp.Dns.DTO.Scanner.csproj", "{E46B9B37-5144-4EB6-BFC1-85CDFCCBB6E1}"
 EndProject

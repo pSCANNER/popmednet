@@ -43,7 +43,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Common.Base {
         ///     Initializes a new instance of the <see cref="BaseRequestParameter"/> class.
         /// </summary>
         /// <param name="requestParameter">The request parameter.</param>
-        protected BaseRequestParameter(BaseRequestParameter requestParameter) : this(requestParameter.RequestId, requestParameter.RequestFor, new EmptyDataConnection()) { }
+        protected BaseRequestParameter(BaseRequestParameter requestParameter) : this(requestParameter.RequestId, requestParameter.RequestFor) { }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="BaseRequestParameter"/> class.

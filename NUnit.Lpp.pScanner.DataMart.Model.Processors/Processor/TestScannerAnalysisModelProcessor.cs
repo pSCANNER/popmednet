@@ -14,7 +14,7 @@ namespace Test.Lpp.pScanner.DataMart.Model.Processors.Processor {
     internal class TestScannerAnalysisModelProcessor : TestScannerAnalysisModelProcessorBase {
 
         [Test, Order(1)]
-        public void RequestDocument_Test() {
+        public void Processor_RequestDocument_Test() {
             _processor.Request(RequestId, _network, _requestMetadata, _requestAnalyticDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments);
 
             _processor.RequestDocument(RequestId, DataSetId, _dataSetStream);
@@ -25,7 +25,7 @@ namespace Test.Lpp.pScanner.DataMart.Model.Processors.Processor {
         }
 
         [Test, Order(2)]
-        public void Start_Test() {
+        public void Processor_Start_Test() {
             //UCLA_LogReg_CSV
             _processor.Start(RequestId);
         }

@@ -139,8 +139,19 @@ namespace NUnit.Lpp.pScanner.DataMart.Model.Processors.Processor {
             _processor = null;
         }
 
+        /// <summary>
+        ///     The data set identifier
+        /// </summary>
         protected const string DataSetId = "1";
+
+        /// <summary>
+        ///     The parameter document identifier
+        /// </summary>
         protected const string ParameterDocId = "2";
+
+        /// <summary>
+        ///     The PMML document identifier
+        /// </summary>
         protected const string PmmlDocumentId = "3";
 
         /// <summary>
@@ -198,6 +209,9 @@ namespace NUnit.Lpp.pScanner.DataMart.Model.Processors.Processor {
         /// </summary>
         protected RequestMetadata _requestMetadata;
 
-        private const string TestFileFolder = "Common.scanner.test_files";
+        /// <summary>
+        ///     The test file folder
+        /// </summary>
+        private const string TestFileFolder = "Common.scanner.analytics.test_files";
     }
 }

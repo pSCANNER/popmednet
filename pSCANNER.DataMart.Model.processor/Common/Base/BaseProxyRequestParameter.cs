@@ -14,7 +14,7 @@
 
 using Lpp.Scanner.DataMart.Model.Processors.Common.Parameters;
 using Lpp.Scanner.DataMart.Model.Processors.DataSetMapping;
-using Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.Configuration;
+
 using pSCANNER.DataMart.Model.processor.DataSetMapping.Configuration;
 
 #endregion Using

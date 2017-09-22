@@ -1,53 +1,28 @@
-﻿using Lpp.Scanner.DataMart.Model.Processors.Aggregation;
-using Lpp.Scanner.DataMart.Model.Processors.Aggregation.Common;
-using Lpp.Scanner.DataMart.Model.Processors.Common.Processor.Task;
+﻿using Lpp.Dns.DataMart.Model;
 using NUnit.Framework;
-using pSCANNER.DataMart.Model.processor.Aggregation;
-using System.IO;
+using NUnit.Lpp.pScanner.DataMart.Model.Processors.Aggregator;
+using System.Collections.Generic;
 
 namespace Test.Lpp.pScanner.DataMart.Model.Processors.Aggregator {
 
-    //[TestFixture]
-    public class TestScannerAnalysisModelAggregator {
+    [TestFixture]
+    public class TestScannerAnalysisModelAggregator : TestScannerAnalysisModelAggregatorBase {
 
-        /// <summary>
-        ///     Initializes the test.
-        /// </summary>
-        [OneTimeSetUp]
-        public void InitializeTest() {
-            _aggregator = new ScannerAnalysisModelAggregator(new PScannerAggregatorProxy<AsyncTask>(), new ScannerAggregationModelMetadata());
+        [Test, Order(1)]
+        public void Aggregator_RequestDocument_Test() {
+            _aggregator.Request(RequestId, _network, _requestMetadata, _requestAnalyticDocuments, out IDictionary<string, string> requestProperties, out Document[] desiredDocuments);
+
+            _processor.RequestDocument(RequestId, DataSetId, _dataSetStream);
+
+            _processor.RequestDocument(RequestId, ParameterDocId, _parametersSteam);
+
+            _processor.RequestDocument(RequestId, PmmlDocumentId, _pmmlStream);
         }
 
-        [OneTimeTearDown]
-        public void TearDown() {
-            _aggregator = null;
+        [Test, Order(2)]
+        public void Aggregator_Start_Test() {
+            //UCLA_LogReg_CSV
+            _aggregator.Start(RequestId);
         }
-
-        /// <summary>
-        ///     Tests the request document.
-        /// </summary>
-        [Test]
-        public void TestRequestDocument() {
-            string requestId = null;
-            string documentId = null;
-            Stream contentStream = null;
-            _aggregator.RequestDocument(requestId, documentId, contentStream);
-        }
-
-        /// <summary>
-        ///     Tests the response document.
-        /// </summary>
-        [Test]
-        public void TestResponseDocument() {
-            string requestId = null;
-            string documentId = null;
-            int maxSize = 0;
-            _aggregator.ResponseDocument(requestId, documentId, out Stream contentStream, maxSize);
-        }
-
-        /// <summary>
-        ///     The aggregator
-        /// </summary>
-        private ScannerAnalysisModelAggregator _aggregator;
     }
 }

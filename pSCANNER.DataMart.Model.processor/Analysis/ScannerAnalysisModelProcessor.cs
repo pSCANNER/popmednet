@@ -17,7 +17,7 @@ using Lpp.Scanner.DataMart.Model.Processors.Common.Base;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Models;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Parameters;
 using Lpp.Scanner.DataMart.Model.Processors.Common.Parameters.Response;
-using Lpp.Scanner.DataMart.Model.Processors.DataSetMapping.Configuration;
+
 using Newtonsoft.Json;
 using pSCANNER.DataMart.Model.processor.Analysis;
 using pSCANNER.DataMart.Model.processor.Analysis.Common;
@@ -224,7 +224,7 @@ namespace Lpp.Scanner.DataMart.Model.Processors.Analysis {
         private string getResponse(string requestId, string parametersJson, string dataSetJson, string pmmlJson, IDictionary<string, object> settings) {
             var extensions = GetExtensions(parametersJson);
             var dataSetName = GetDataSetName(dataSetJson);
-            IDataSetConnection connection = BaseDataSetConnection.Get(dataSetName);
+            IDataSetConnection connection = DataSetConnection.Get(dataSetName);
             var iterative = IsIterative(extensions);
 
             BaseProxyRequestParameter requestParameter;
