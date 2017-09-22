@@ -383,6 +383,11 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
             }
         }
 
+        public void FilterDocs()
+        {
+
+        }
+
         List<QueryComposerModelProcessor.DocumentEx> FilesToUpload(string directory)
         {
             List<QueryComposerModelProcessor.DocumentEx> documents = new List<QueryComposerModelProcessor.DocumentEx>();

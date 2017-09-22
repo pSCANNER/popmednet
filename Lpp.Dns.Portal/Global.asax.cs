@@ -84,9 +84,9 @@ namespace Lpp.Dns.Portal.Root
 
         }
 
+#if DEBUG
         protected void Application_Error(object sender, EventArgs e)
         {
-#if DEBUG
             Exception exc = Server.GetLastError();
             string errorMessage = "\r\n";
             errorMessage += "URL: " + HttpContext.Current.Request.Url + "\r\n";
@@ -95,8 +95,8 @@ namespace Lpp.Dns.Portal.Root
             errorMessage += "StackTrace: " + exc.StackTrace + "\r\n";
             HttpContext.Current.ApplicationInstance.CompleteRequest();
             Server.ClearError();
-#endif
         }
+#endif
 
 
         class LoggerExport

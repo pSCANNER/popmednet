@@ -272,11 +272,12 @@ namespace Lpp.Dns.Data
             currentTask.Status = DTO.Enums.TaskStatuses.Complete;
             currentTask.EndOn = DateTime.UtcNow;
             currentTask.PercentComplete = 100d;
-
+            List<Guid> responseIDs = new List<Guid>();
             //open new task and set the request to the new activity
             var task = DB.Actions.Add(PmnTask.CreateForWorkflowActivity(reqDM.Request.ID, CompleteDistributionActivityID, WorkflowID, DB));
             reqDM.Request.WorkFlowActivityID = CompleteDistributionActivityID;
 
+            List<Lpp.Dns.DTO.QueryComposer.DistributedRegressionAnalysisCenterResultManifestItem> manifestItems = new List<DTO.QueryComposer.DistributedRegressionAnalysisCenterResultManifestItem>();
             //get the documents uploaded by the analysis center
             var documents = await (from rd in DB.RequestDocuments
                                    join rsp in DB.Responses on rd.ResponseID equals rsp.ID
@@ -329,8 +330,6 @@ namespace Lpp.Dns.Data
             else
             {
                 //the output files from the analysis center will now become the input files for each active dataparter route
-                List<Guid> responseIDs = new List<Guid>();
-
                 var dataPartnerRoutes = await DB.RequestDataMarts.Include(rdm => rdm.Responses).Where(rdm => rdm.RequestID == reqDM.Request.ID && rdm.Status != RoutingStatus.Canceled && rdm.RoutingType == RoutingType.DataPartner).ToArrayAsync();
                 foreach (var route in dataPartnerRoutes)
                 {
@@ -351,7 +350,9 @@ namespace Lpp.Dns.Data
                         reader.ReadLine();
 
                         string line, filename;
+                        Guid fileDataMartDestination = new Guid();
                         bool includeInDistribution = false;
+
                         while (!reader.EndOfStream)
                         {
                             line = reader.ReadLine();
@@ -371,12 +372,26 @@ namespace Lpp.Dns.Data
                                 if (includeInDistribution == false)
                                     continue;
 
+                                if (split.Length > 2)
+                                {
+                                    fileDataMartDestination = new Guid(split[2].Trim());
+                                }
+
                                 if (!string.IsNullOrEmpty(filename))
                                 {
                                     Guid? revisionSetID = documents.Where(d => string.Equals(d.FileName, filename, StringComparison.OrdinalIgnoreCase)).Select(d => d.RevisionSetID).FirstOrDefault();
                                     if (revisionSetID.HasValue)
                                     {
                                         DB.RequestDocuments.AddRange(responseIDs.Select(rspID => new RequestDocument { DocumentType = RequestDocumentType.Input, ResponseID = rspID, RevisionSetID = revisionSetID.Value }).ToArray());
+
+                                        manifestItems.AddRange(documents.Where(d => d.RevisionSetID == revisionSetID.Value).Select(d => new DTO.QueryComposer.DistributedRegressionAnalysisCenterResultManifestItem
+                                        {
+                                            DocumentID = d.DocumentID,
+                                            AnalysisCenterIdentifier = reqDM.DataMartID,
+                                            ResponseID = DB.RequestDocuments.FirstOrDefault().ResponseID,
+                                            DataMartDestinationID = fileDataMartDestination,
+                                            RevisionSetID = d.RevisionSetID
+                                        }).ToArray());
                                     }
                                 }
                             }
@@ -398,9 +413,58 @@ namespace Lpp.Dns.Data
                                            };
 
                     DB.RequestDocuments.AddRange(requestDocuments);
+                    manifestItems.AddRange(documents.Select(d => new DTO.QueryComposer.DistributedRegressionAnalysisCenterResultManifestItem
+                    {
+                        DocumentID = d.DocumentID,
+                        AnalysisCenterIdentifier = reqDM.DataMartID,
+                        ResponseID = responseIDs.FirstOrDefault(),
+                        DataMartDestinationID = new Guid(),
+                        RevisionSetID = d.RevisionSetID
+                    }).ToArray());
                 }
 
             }
+
+            byte[] buffer;
+            using (var ms = new System.IO.MemoryStream())
+            using (var sw = new System.IO.StreamWriter(ms))
+            using (var jw = new Newtonsoft.Json.JsonTextWriter(sw))
+            {
+                Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
+                serializer.Serialize(jw, manifestItems);
+                jw.Flush();
+
+                buffer = ms.ToArray();
+            }
+
+            //create and add the manifest file
+            Document analysisCenterResultManifest = DB.Documents.Add(new Document
+            {
+                Description = "Contains information about the analysis center results and the datamarts they are destined to.",
+                Name = "Internal: Analysis Center Result Manifest",
+                FileName = "manifestDestination.json",
+                ItemID = task.ID,
+                Kind = DocumentKind.SystemGeneratedNoLog,
+                UploadedByID = IdentityID,
+                Viewable = false,
+                MimeType = "application/json",
+                Length = buffer.Length
+            });
+
+            analysisCenterResultManifest.RevisionSetID = analysisCenterResultManifest.ID;
+
+            //DB.RequestDocuments.Add(new RequestDocument { DocumentType = RequestDocumentType.Input, ResponseID = DB.RequestDocuments.FirstOrDefault().ResponseID, RevisionSetID = analysisCenterResultManifest.RevisionSetID.Value });
+            DB.RequestDocuments.AddRange(
+                responseIDs.Select(rspID => new RequestDocument
+                {
+                    DocumentType = RequestDocumentType.Input,
+                    ResponseID = rspID,
+                    RevisionSetID = analysisCenterResultManifest.RevisionSetID.Value
+                }
+            ).ToArray());
+            await DB.SaveChangesAsync();
+
+            analysisCenterResultManifest.SetData(DB, buffer);
 
             await DB.SaveChangesAsync();
         }

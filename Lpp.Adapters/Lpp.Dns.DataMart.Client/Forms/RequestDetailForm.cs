@@ -122,12 +122,16 @@ namespace Lpp.Dns.DataMart.Client
                 RefreshRequestHeader();
 
                 Lpp.Dns.DataMart.Model.Document[] requestDocuments = Request.Documents.Select(d => new Lpp.Dns.DataMart.Model.Document(d.ID.ToString("D"), d.Document.MimeType, d.Document.Name) { IsViewable = d.Document.IsViewable, Size = Convert.ToInt32(d.Document.Size), Kind = d.Document.Kind }).ToArray();
-
-                if(Processor is IEarlyInitializeModelProcessor)
+                
+                if (Processor is IEarlyInitializeModelProcessor)
                 {
                     ((IEarlyInitializeModelProcessor)Processor).Initialize(ModelDesc.ModelId, Request.Documents.Select(d => new DocumentWithStream(d.ID, new Document(d.ID, d.Document.MimeType, d.Document.Name, d.Document.IsViewable, Convert.ToInt32(d.Document.Size), d.Document.Kind), new DocumentChunkStream(d.ID, netWorkSetting))).ToArray());
                 }
-
+                
+                if (requestDocuments.Select(x => x.Filename == "manifestDestination.json") != null)
+                {
+                    requestDocuments = FilterDocs(Request, netWorkSetting);
+                }
                 vpRequest.SetRequestDocuments(requestDocuments, netWorkSetting, Processor);
                 
                 //set the initial value of the view request file list checkbox and then hook up the checked change event
@@ -1075,6 +1079,60 @@ namespace Lpp.Dns.DataMart.Client
         private void vpResponse_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private Document[] FilterDocs(HubRequest request, NetWorkSetting networkSetting)
+        {
+            Guid localDataMartID = request.DataMartId;
+            List<Document> filteredDocs = new List<Document>();
+            DocumentWithStream[] requestDocuments = Request.Documents.Select(
+                d => new DocumentWithStream(d.ID,
+                    new Document(
+                        d.ID,
+                        d.Document.MimeType,
+                        d.Document.Name,
+                        d.Document.IsViewable,
+                        Convert.ToInt32(d.Document.Size),
+                        d.Document.Kind),
+                    new DocumentChunkStream(d.ID, networkSetting)))
+                    .ToArray();
+
+            var manifestDocument = requestDocuments.FirstOrDefault(
+                d => string.Equals(
+                    d.Document.Filename, 
+                    "manifestDestination.json", 
+                    StringComparison.OrdinalIgnoreCase) && 
+                    d.Document.Kind == DTO.Enums.DocumentKind.SystemGeneratedNoLog);
+
+            if (manifestDocument != null)
+            {
+                using (var sr = new StreamReader(manifestDocument.Stream))
+                using (var jr = new Newtonsoft.Json.JsonTextReader(sr))
+                {
+                    var serializer = new Newtonsoft.Json.JsonSerializer();
+                    var manifestItems = serializer.Deserialize<DTO.QueryComposer.DistributedRegressionAnalysisCenterResultManifestItem[]>(jr);
+
+                    if (manifestItems != null)
+                    {
+                        foreach(var item in manifestItems)
+                        {
+                            Guid destinationID = item.DataMartDestinationID;
+                            if (localDataMartID == destinationID || destinationID == Guid.Empty)
+                            {
+                                filteredDocs.Add(
+                                    request.Documents.Select(
+                                        d => new Document(
+                                            d.ID.ToString("D"), 
+                                            d.Document.MimeType, 
+                                            d.Document.Name)
+                                        { IsViewable = d.Document.IsViewable, Size = Convert.ToInt32(d.Document.Size), Kind = d.Document.Kind })
+                                        .First(z => z.DocumentID == item.DocumentID.ToString()));
+                            }
+                        }
+                    }
+                }
+            }
+            return filteredDocs.ToArray();
         }
     }
 }
