@@ -69,33 +69,6 @@ namespace Lpp.Dns.Data
             var currentTask = await PmnTask.GetActiveTaskForRequestActivityAsync(reqDM.Request.ID, reqDM.Request.WorkFlowActivityID.Value, DB);
             CompleteTask(currentTask);
 
-            //open new task and set the request to the new activity
-            var task = DB.Actions.Add(PmnTask.CreateForWorkflowActivity(reqDM.Request.ID, ConductAnalysisActivityID, WorkflowID, DB));
-            reqDM.Request.WorkFlowActivityID = ConductAnalysisActivityID;
-
-            //create new routing
-            var analysisCenterRouting = await DB.RequestDataMarts.Include(rdm => rdm.Responses).Where(rdm => rdm.RequestID == reqDM.Request.ID && rdm.RoutingType == RoutingType.AnalysisCenter).FirstOrDefaultAsync();
-
-            Lpp.Dns.Data.Response analysisCenterResponse = null;
-            if (analysisCenterRouting.Status == RoutingStatus.Draft && analysisCenterRouting.Responses.Count == 1 && analysisCenterRouting.Responses.Where(rsp => rsp.ResponseTime.HasValue == false).Any())
-            {
-                //if the initial status of the routing is draft, and there is only a single response assume this is the first time hitting the analysis center.
-                //use the existing response to submit to the analysis center
-                analysisCenterResponse = analysisCenterRouting.Responses.First();
-            }
-            else if (analysisCenterRouting.Status != RoutingStatus.Draft)
-            {
-                analysisCenterRouting.Status = RoutingStatus.Draft;
-            }
-            
-            if (analysisCenterResponse == null)
-            {
-                analysisCenterResponse = analysisCenterRouting.AddResponse(IdentityID);
-            }
-
-            //use all the dp output documents to be the input documents for the AC routing
-            //build a manifest for where the documents are coming from
-            List<Lpp.Dns.DTO.QueryComposer.DistributedRegressionAnalysisCenterManifestItem> manifestItems = new List<DTO.QueryComposer.DistributedRegressionAnalysisCenterManifestItem>();
             var q = from rd in DB.RequestDocuments
                     join rsp in DB.Responses on rd.ResponseID equals rsp.ID
                     join rdm in DB.RequestDataMarts on rsp.RequestDataMartID equals rdm.ID
@@ -121,143 +94,186 @@ namespace Lpp.Dns.Data
                     };
 
             var documents = await (q).ToArrayAsync();
-
-            // further filtering based on if a output filelist document was included needs to be done. Only the files indicated should be passed on to the analysis center
-            foreach(var dpDocuments in documents.GroupBy(k => k.RequestDataMartID))
+            if (documents.All(d => d.DocumentKind == StopProcessingTriggerDocumentKind))
+            {
+                var donetask = DB.Actions.Add(PmnTask.CreateForWorkflowActivity(reqDM.Request.ID, CompleteDistributionActivityID, WorkflowID, DB));
+                //stop file, end regression. All the routes should be complete now and the request status should be already in Completed. Just need to update the current activity.
+                CompleteTask(donetask);
+                reqDM.Request.WorkFlowActivityID = CompletedActivityID;
+                await DB.SaveChangesAsync();
+            }
+            else
             {
 
-                var filelistDocument = dpDocuments.Where(d => !string.IsNullOrEmpty(d.DocumentKind) && string.Equals("DistributedRegression.FileList", d.DocumentKind, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                if(filelistDocument != null)
+
+
+                //open new task and set the request to the new activity
+                var task = DB.Actions.Add(PmnTask.CreateForWorkflowActivity(reqDM.Request.ID, ConductAnalysisActivityID, WorkflowID, DB));
+                reqDM.Request.WorkFlowActivityID = ConductAnalysisActivityID;
+
+                //create new routing
+                var analysisCenterRouting = await DB.RequestDataMarts.Include(rdm => rdm.Responses).Where(rdm => rdm.RequestID == reqDM.Request.ID && rdm.RoutingType == RoutingType.AnalysisCenter).FirstOrDefaultAsync();
+
+                Lpp.Dns.Data.Response analysisCenterResponse = null;
+                if (analysisCenterRouting.Status == RoutingStatus.Draft && analysisCenterRouting.Responses.Count == 1 && analysisCenterRouting.Responses.Where(rsp => rsp.ResponseTime.HasValue == false).Any())
+                {
+                    //if the initial status of the routing is draft, and there is only a single response assume this is the first time hitting the analysis center.
+                    //use the existing response to submit to the analysis center
+                    analysisCenterResponse = analysisCenterRouting.Responses.First();
+                }
+                else if (analysisCenterRouting.Status != RoutingStatus.Draft)
+                {
+                    analysisCenterRouting.Status = RoutingStatus.Draft;
+                }
+
+                if (analysisCenterResponse == null)
+                {
+                    analysisCenterResponse = analysisCenterRouting.AddResponse(IdentityID);
+                }
+
+                //use all the dp output documents to be the input documents for the AC routing
+                //build a manifest for where the documents are coming from
+                List<Lpp.Dns.DTO.QueryComposer.DistributedRegressionAnalysisCenterManifestItem> manifestItems = new List<DTO.QueryComposer.DistributedRegressionAnalysisCenterManifestItem>();
+
+
+                // further filtering based on if a output filelist document was included needs to be done. Only the files indicated should be passed on to the analysis center
+                foreach (var dpDocuments in documents.GroupBy(k => k.RequestDataMartID))
                 {
 
-                    //only include the files indicated in the filelist document
-                    using (var ds = new Lpp.Dns.Data.Documents.DocumentStream(DB, filelistDocument.DocumentID))
-                    using (var reader = new System.IO.StreamReader(ds))
+                    var filelistDocument = dpDocuments.Where(d => !string.IsNullOrEmpty(d.DocumentKind) && string.Equals("DistributedRegression.FileList", d.DocumentKind, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                    if (filelistDocument != null)
                     {
-                        //read the header line
-                        reader.ReadLine();
 
-                        string line, filename;
-                        bool includeInDistribution = false;
-                        while (!reader.EndOfStream)
+                        //only include the files indicated in the filelist document
+                        using (var ds = new Lpp.Dns.Data.Documents.DocumentStream(DB, filelistDocument.DocumentID))
+                        using (var reader = new System.IO.StreamReader(ds))
                         {
-                            line = reader.ReadLine();
-                            string[] split = line.Split(',');
-                            if (split.Length > 0)
+                            //read the header line
+                            reader.ReadLine();
+
+                            string line, filename;
+                            bool includeInDistribution = false;
+                            while (!reader.EndOfStream)
                             {
-                                filename = split[0].Trim();
-                                if (split.Length > 1)
+                                line = reader.ReadLine();
+                                string[] split = line.Split(',');
+                                if (split.Length > 0)
                                 {
-                                    includeInDistribution = string.Equals(split[1].Trim(), "1");
-                                }
-                                else
-                                {
-                                    includeInDistribution = false;
-                                }
-
-                                if (includeInDistribution == false)
-                                    continue;
-
-                                if (!string.IsNullOrEmpty(filename))
-                                {
-                                    Guid? revisionSetID = dpDocuments.Where(d => string.Equals(d.DocumentFileName, filename, StringComparison.OrdinalIgnoreCase)).Select(d => d.RevisionSetID).FirstOrDefault();
-                                    if (revisionSetID.HasValue)
+                                    filename = split[0].Trim();
+                                    if (split.Length > 1)
                                     {
-                                        DB.RequestDocuments.AddRange(dpDocuments.Where(d => d.RevisionSetID == revisionSetID.Value).Select(d => new RequestDocument { DocumentType = RequestDocumentType.Input, ResponseID = analysisCenterResponse.ID, RevisionSetID = d.RevisionSetID }).ToArray());
-                                        manifestItems.AddRange(dpDocuments.Where(d => d.RevisionSetID == revisionSetID.Value).Select(d => new DTO.QueryComposer.DistributedRegressionAnalysisCenterManifestItem
+                                        includeInDistribution = string.Equals(split[1].Trim(), "1");
+                                    }
+                                    else
+                                    {
+                                        includeInDistribution = false;
+                                    }
+
+                                    if (includeInDistribution == false)
+                                        continue;
+
+                                    if (!string.IsNullOrEmpty(filename))
+                                    {
+                                        Guid? revisionSetID = dpDocuments.Where(d => string.Equals(d.DocumentFileName, filename, StringComparison.OrdinalIgnoreCase)).Select(d => d.RevisionSetID).FirstOrDefault();
+                                        if (revisionSetID.HasValue)
                                         {
-                                            DocumentID = d.DocumentID,
-                                            DataMart = d.DataMart,
-                                            DataMartID = d.DataMartID,
-                                            DataPartnerIdentifier = d.DataPartnerIdentifier,
-                                            RequestDataMartID = d.RequestDataMartID,
-                                            ResponseID = d.ResponseID,
-                                            RevisionSetID = d.RevisionSetID
-                                        }).ToArray());
+                                            DB.RequestDocuments.AddRange(dpDocuments.Where(d => d.RevisionSetID == revisionSetID.Value).Select(d => new RequestDocument { DocumentType = RequestDocumentType.Input, ResponseID = analysisCenterResponse.ID, RevisionSetID = d.RevisionSetID }).ToArray());
+                                            manifestItems.AddRange(dpDocuments.Where(d => d.RevisionSetID == revisionSetID.Value).Select(d => new DTO.QueryComposer.DistributedRegressionAnalysisCenterManifestItem
+                                            {
+                                                DocumentID = d.DocumentID,
+                                                DataMart = d.DataMart,
+                                                DataMartID = d.DataMartID,
+                                                DataPartnerIdentifier = d.DataPartnerIdentifier,
+                                                RequestDataMartID = d.RequestDataMartID,
+                                                ResponseID = d.ResponseID,
+                                                RevisionSetID = d.RevisionSetID
+                                            }).ToArray());
+                                        }
                                     }
                                 }
                             }
+
+                            reader.Close();
                         }
 
-                        reader.Close();
                     }
-
+                    else
+                    {
+                        DB.RequestDocuments.AddRange(dpDocuments.Select(d => new RequestDocument { DocumentType = RequestDocumentType.Input, ResponseID = analysisCenterResponse.ID, RevisionSetID = d.RevisionSetID }).ToArray());
+                        manifestItems.AddRange(dpDocuments.Select(d => new DTO.QueryComposer.DistributedRegressionAnalysisCenterManifestItem
+                        {
+                            DocumentID = d.DocumentID,
+                            DataMart = d.DataMart,
+                            DataMartID = d.DataMartID,
+                            DataPartnerIdentifier = d.DataPartnerIdentifier,
+                            RequestDataMartID = d.RequestDataMartID,
+                            ResponseID = d.ResponseID,
+                            RevisionSetID = d.RevisionSetID
+                        }).ToArray());
+                    }
                 }
-                else
+
+                //serialize the manifest of dataparter documents to the analysis center
+                byte[] buffer;
+                using (var ms = new System.IO.MemoryStream())
+                using (var sw = new System.IO.StreamWriter(ms))
+                using (var jw = new Newtonsoft.Json.JsonTextWriter(sw))
                 {
-                    DB.RequestDocuments.AddRange(dpDocuments.Select(d => new RequestDocument { DocumentType = RequestDocumentType.Input, ResponseID = analysisCenterResponse.ID, RevisionSetID = d.RevisionSetID }).ToArray());
-                    manifestItems.AddRange(dpDocuments.Select(d=> new DTO.QueryComposer.DistributedRegressionAnalysisCenterManifestItem {
-                        DocumentID = d.DocumentID,
-                        DataMart = d.DataMart,
-                        DataMartID = d.DataMartID,
-                        DataPartnerIdentifier = d.DataPartnerIdentifier,
-                        RequestDataMartID = d.RequestDataMartID,
-                        ResponseID = d.ResponseID,
-                        RevisionSetID = d.RevisionSetID
-                    }).ToArray());
+                    Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
+                    serializer.Serialize(jw, manifestItems);
+                    jw.Flush();
+
+                    buffer = ms.ToArray();
                 }
-            }
 
-            //serialize the manifest of dataparter documents to the analysis center
-            byte[] buffer;
-            using (var ms = new System.IO.MemoryStream())
-            using (var sw = new System.IO.StreamWriter(ms))
-            using (var jw = new Newtonsoft.Json.JsonTextWriter(sw))
-            {
-                Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
-                serializer.Serialize(jw, manifestItems);
-                jw.Flush();
+                //create and add the manifest file
+                Document analysisCenterManifest = DB.Documents.Add(new Document
+                {
+                    Description = "Contains information about the input documents and the datamart they came from.",
+                    Name = "Internal: Analysis Center Manifest",
+                    FileName = "manifest.json",
+                    ItemID = task.ID,
+                    Kind = DocumentKind.SystemGeneratedNoLog,
+                    UploadedByID = IdentityID,
+                    Viewable = false,
+                    MimeType = "application/json",
+                    Length = buffer.Length
+                });
 
-                buffer = ms.ToArray();
-            }
+                analysisCenterManifest.RevisionSetID = analysisCenterManifest.ID;
 
-            //create and add the manifest file
-            Document analysisCenterManifest = DB.Documents.Add(new Document
-            {
-                Description = "Contains information about the input documents and the datamart they came from.",
-                Name = "Internal: Analysis Center Manifest",
-                FileName = "manifest.json",
-                ItemID = task.ID,
-                Kind = DocumentKind.SystemGeneratedNoLog,
-                UploadedByID = IdentityID,
-                Viewable = false,
-                MimeType = "application/json",
-                Length = buffer.Length
-            });
+                //TODO:determine if there is a parent document to make the manifest a revision of. If there is update the revisionset id, and version numbers
+                //chances are there should not be unless this is a resubmit for the same task
 
-            analysisCenterManifest.RevisionSetID = analysisCenterManifest.ID;
+                DB.RequestDocuments.Add(new RequestDocument { DocumentType = RequestDocumentType.Input, ResponseID = analysisCenterResponse.ID, RevisionSetID = analysisCenterManifest.RevisionSetID.Value });
 
-            //TODO:determine if there is a parent document to make the manifest a revision of. If there is update the revisionset id, and version numbers
-            //chances are there should not be unless this is a resubmit for the same task
-
-            DB.RequestDocuments.Add(new RequestDocument { DocumentType = RequestDocumentType.Input, ResponseID = analysisCenterResponse.ID, RevisionSetID = analysisCenterManifest.RevisionSetID.Value });
-                        
-            await DB.SaveChangesAsync();
-            await DB.Entry(analysisCenterRouting).ReloadAsync();
-
-            //post the manifest content
-            analysisCenterManifest.SetData(DB, buffer);
-
-            //submit the routing
-            analysisCenterRouting.Status = analysisCenterResponse.Count > 1 ? RoutingStatus.Resubmitted : RoutingStatus.Submitted;
-            await DB.SaveChangesAsync();
-
-            //Check for Job Fail trigger, and update Data Partner Routing to Failed. 
-            //Request status will not be affected.
-            if (documents.Any(d => d.DocumentKind == JobFailTriggerFileKind))
-            {
-                //Reload the entity before updating the status, else EF will report an exception.
-                await DB.Entry(reqDM).ReloadAsync();
-
-                reqDM.Status = RoutingStatus.Failed;
                 await DB.SaveChangesAsync();
+                await DB.Entry(analysisCenterRouting).ReloadAsync();
+
+                //post the manifest content
+                analysisCenterManifest.SetData(DB, buffer);
+
+                //submit the routing
+                analysisCenterRouting.Status = analysisCenterResponse.Count > 1 ? RoutingStatus.Resubmitted : RoutingStatus.Submitted;
+                await DB.SaveChangesAsync();
+
+                //Check for Job Fail trigger, and update Data Partner Routing to Failed. 
+                //Request status will not be affected.
+                if (documents.Any(d => d.DocumentKind == JobFailTriggerFileKind))
+                {
+                    //Reload the entity before updating the status, else EF will report an exception.
+                    await DB.Entry(reqDM).ReloadAsync();
+
+                    reqDM.Status = RoutingStatus.Failed;
+                    await DB.SaveChangesAsync();
+                }
+
+                //change the status of the request to conducting analysis
+                //manually override the request status using sql direct, EF does not allow update of computed
+                await DB.Database.ExecuteSqlCommandAsync("UPDATE Requests SET Status = @status WHERE ID = @ID", new System.Data.SqlClient.SqlParameter("@status", (int)RequestStatuses.ConductingAnalysis), new System.Data.SqlClient.SqlParameter("@ID", reqDM.Request.ID));
+
+                await DB.Entry(reqDM.Request).ReloadAsync();
             }
-
-            //change the status of the request to conducting analysis
-            //manually override the request status using sql direct, EF does not allow update of computed
-            await DB.Database.ExecuteSqlCommandAsync("UPDATE Requests SET Status = @status WHERE ID = @ID", new System.Data.SqlClient.SqlParameter("@status", (int)RequestStatuses.ConductingAnalysis), new System.Data.SqlClient.SqlParameter("@ID", reqDM.Request.ID));
-
-            await DB.Entry(reqDM.Request).ReloadAsync();
         }
 
         /// <summary>

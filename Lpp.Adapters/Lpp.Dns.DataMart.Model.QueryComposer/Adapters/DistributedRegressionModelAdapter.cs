@@ -67,7 +67,7 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
             }
 
             //The triggers have been modified to remove the monitoring for Job Stop file. (ASPE-510)
-            TriggerFileNames = new[] { JobStartFilename, ExecutionCompleteFilename, JobFailFilename };
+            TriggerFileNames = new[] { JobStartFilename, ExecutionCompleteFilename, JobFailFilename, JobStopFilename };
         }
 
         public override DTO.QueryComposer.QueryComposerResponseDTO Execute(DTO.QueryComposer.QueryComposerRequestDTO request, bool viewSQL)
@@ -120,15 +120,15 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
             if (requestDocs.Any(d => string.Equals(Path.GetExtension(d.Document.Filename), ".zip", StringComparison.OrdinalIgnoreCase)))
             {
                 //initial iteration with the setup package, extract if the "inputfiles" folder is empty
-                if(!Directory.EnumerateFileSystemEntries(inputfilesFolderPath).Any())
-                {
-                    var initialSetupPackage = requestDocs.First(d => string.Equals(Path.GetExtension(d.Document.Filename), ".zip", StringComparison.OrdinalIgnoreCase));
+                //if(!Directory.EnumerateFileSystemEntries(inputfilesFolderPath).Any())
+                //{
+                //    var initialSetupPackage = requestDocs.First(d => string.Equals(Path.GetExtension(d.Document.Filename), ".zip", StringComparison.OrdinalIgnoreCase));
 
-                    using (ZipArchive archive = new ZipArchive(initialSetupPackage.Stream))
-                    {
-                        archive.ExtractToDirectory(Path.Combine(RootMonitorFolder, RequestIdentifier));
-                    }
-                }
+                //    using (ZipArchive archive = new ZipArchive(initialSetupPackage.Stream))
+                //    {
+                //        archive.ExtractToDirectory(Path.Combine(RootMonitorFolder, RequestIdentifier));
+                //    }
+                //}
             }
             else
             {
@@ -155,14 +155,14 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
             }
 
             //The triggers have been modified to remove the monitoring for Job Stop file. (ASPE-510)
-            if (!TriggerFileExists(outputfilesFolderPath, new[] { JobStartFilename, ExecutionCompleteFilename }))
+            if (!TriggerFileExists(outputfilesFolderPath, new[] { JobStartFilename, ExecutionCompleteFilename, JobStopFilename }))
             {
                 FileSystemWatcher directoryWatcher = new FileSystemWatcher(outputfilesFolderPath, "*.*");
                 directoryWatcher.Created += (object sender, FileSystemEventArgs e) =>
                 {
 
                     //monitor for either the job started, execution successful, or job end trigger file
-                    if (e.ChangeType == WatcherChangeTypes.Created && (string.Equals(e.Name, JobStartFilename, StringComparison.OrdinalIgnoreCase) || string.Equals(e.Name, ExecutionCompleteFilename, StringComparison.OrdinalIgnoreCase)))
+                    if (e.ChangeType == WatcherChangeTypes.Created && (string.Equals(e.Name, JobStartFilename, StringComparison.OrdinalIgnoreCase) || string.Equals(e.Name, ExecutionCompleteFilename, StringComparison.OrdinalIgnoreCase) || string.Equals(e.Name, JobStopFilename, StringComparison.OrdinalIgnoreCase)))
                     {
                         directoryWatcher.EnableRaisingEvents = false;
                     }
@@ -243,16 +243,23 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
             DistributedRegressionAnalysisCenterManifestItem[] manifestDocuments = null;
 
             Dictionary<Guid, string> datapartnerFolders = new Dictionary<Guid, string>();
+            string requestDirectory = Path.Combine(RootMonitorFolder, RequestIdentifier);
 
             using(var sr = new StreamReader(manifestDocument.Stream))
             using(var jr = new Newtonsoft.Json.JsonTextReader(sr))
             {
                 var serializer = new Newtonsoft.Json.JsonSerializer();
                 manifestDocuments = serializer.Deserialize<DistributedRegressionAnalysisCenterManifestItem[]>(jr);
-            } 
+                using (StreamWriter file = File.CreateText(Path.Combine(requestDirectory, "manifest.json")))
+                {
+                    serializer.Serialize(file, manifestDocuments);
+                }
+            }
+
+            //writes out the manifest json file.
 
             //save the files to the specified folders based on the manifest file
-            foreach(var document in manifestDocuments)
+            foreach (var document in manifestDocuments)
             {
                 if (string.IsNullOrEmpty(document.DataPartnerIdentifier))
                 {
@@ -373,7 +380,7 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
 
         void DeleteTriggerFiles(string directory)
         {
-            foreach (var filename in TriggerFileNames.Where(x => x != JobFailFilename))
+            foreach (var filename in TriggerFileNames.Where(x => x != JobFailFilename && x != JobStopFilename))
             {
                 string triggerFilepath = Path.Combine(directory, filename);
                 if (File.Exists(triggerFilepath))
@@ -395,7 +402,7 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
             Guid documentID;
 
             string manifestFilepath = Path.Combine(directory, OutputManifestFilename);
-            if (!File.Exists(manifestFilepath))
+            if (!File.Exists(manifestFilepath) && (!File.Exists(Path.Combine(directory, JobStopFilename))))
             {
                 //If the manifest file is not present, then we're not going to return any files. (ASPE-497)
 
@@ -409,6 +416,21 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
                 //        FileInfo = fi                        
                 //    });
                 //}
+
+                return documents;
+            }
+
+            if ((File.Exists(Path.Combine(directory, JobStopFilename))))
+            {
+
+                fi = new FileInfo(Path.Combine(directory, JobStopFilename));
+                documentID = QueryComposerModelProcessor.NewGuid();
+                documents.Add(new QueryComposerModelProcessor.DocumentEx
+                {
+                    ID = documentID,
+                    Document = new Document(documentID, QueryComposerModelProcessor.GetMimeType(fi.Name), fi.Name, false, Convert.ToInt32(fi.Length), TranslateTriggerFilenameToDocumentKind(fi.Name)),
+                    FileInfo = fi
+                });
 
                 return documents;
             }

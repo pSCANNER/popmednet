@@ -128,7 +128,7 @@ namespace Lpp.Dns.DataMart.Client
                     ((IEarlyInitializeModelProcessor)Processor).Initialize(ModelDesc.ModelId, Request.Documents.Select(d => new DocumentWithStream(d.ID, new Document(d.ID, d.Document.MimeType, d.Document.Name, d.Document.IsViewable, Convert.ToInt32(d.Document.Size), d.Document.Kind), new DocumentChunkStream(d.ID, netWorkSetting))).ToArray());
                 }
                 
-                if (requestDocuments.Select(x => x.Filename == "manifestDestination.json") != null)
+                if (requestDocuments.Any(x => x.Filename == "manifestDestination.json"))
                 {
                     requestDocuments = FilterDocs(Request, netWorkSetting);
                 }
