@@ -40,9 +40,9 @@ namespace NUnit.Lpp.pScanner.DataMart.Model.Processors.Processor {
 
             var assembly = Assembly.GetExecutingAssembly();
             string assembly_name = assembly.GetName().Name;
-            _dataSetResourceName = assembly_name + "." + TestFileFolder + "." + "test_dataset.json";
-            _pmmResourceName = assembly_name + "." + TestFileFolder + "." + "test_pmml.json";
-            _parameterResourceName = assembly_name + "." + TestFileFolder + "." + "test_parameters.json";
+            _dataSetResourceName = string.Format("{0}.{1}.{2}", assembly_name, TestFileFolder, "test_dataset.json");
+            _pmmResourceName = string.Format("{0}.{1}.{2}", assembly_name, TestFileFolder, "test_pmml.json");
+            _parameterResourceName = string.Format("{0}.{1}.{2}", assembly_name, TestFileFolder, "test_parameters.json");
 
             _dataSetStream = assembly.GetManifestResourceStream(_dataSetResourceName);
             _pmmlStream = assembly.GetManifestResourceStream(_pmmResourceName);

@@ -40,9 +40,11 @@ namespace NUnit.Lpp.pScanner.DataMart.Model.Processors.Aggregator {
             var assembly = Assembly.GetExecutingAssembly();
             string assembly_name = assembly.GetName().Name;
 
-            _pmmResourceName = assembly_name + "." + TestFileFolder + "." + "test_pmml.json";
-            _parameterResourceName = assembly_name + "." + TestFileFolder + "." + "test_parameters.json";
+            _dataSetResourceName = string.Format("{0}.{1}.{2}", assembly_name, TestFileFolder, "test_dataset.json");
+            _pmmResourceName = string.Format("{0}.{1}.{2}", assembly_name, TestFileFolder, "test_pmml.json");
+            _parameterResourceName = string.Format("{0}.{1}.{2}", assembly_name, TestFileFolder, "test_parameters.json");
 
+            _dataSetStream = assembly.GetManifestResourceStream(_dataSetResourceName);
             _pmmlStream = assembly.GetManifestResourceStream(_pmmResourceName);
             _parametersSteam = assembly.GetManifestResourceStream(_parameterResourceName);
         }
@@ -98,6 +100,16 @@ namespace NUnit.Lpp.pScanner.DataMart.Model.Processors.Aggregator {
         ///     The aggregator
         /// </summary>
         protected ScannerAnalysisModelAggregator _aggregator;
+
+        /// <summary>
+        ///     The data set resource name
+        /// </summary>
+        protected string _dataSetResourceName;
+
+        /// <summary>
+        ///     The data set stream
+        /// </summary>
+        protected Stream _dataSetStream;
 
         /// <summary>
         ///     The network

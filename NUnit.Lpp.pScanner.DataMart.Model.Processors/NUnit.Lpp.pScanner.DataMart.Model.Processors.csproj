@@ -53,6 +53,8 @@
     <None Include="app.config" />
     <EmbeddedResource Include="Common\scanner\aggregation\test_files\test_parameters.json" />
     <EmbeddedResource Include="Common\scanner\aggregation\test_files\test_pmml.json" />
+    <EmbeddedResource Include="Common\scanner\aggregation\test_files\test_dataset.json" />
+    <None Include="Common\scanner\aggregation\test_files\binary.csv" />
     <None Include="Common\scanner\analytics\test_files\binary.csv" />
     <None Include="packages.config" />
   </ItemGroup>
