@@ -348,6 +348,14 @@ namespace Lpp.Dns.DataMart.Model
             {
                 Settings.Add("MSRequestID", md.MSRequestID);
             }
+            if (Settings.ContainsKey("DataMartID"))
+            {
+                Settings["DataMartID"] = md.DataMartId;
+            }
+            else
+            {
+                Settings.Add("DataMartID", md.DataMartId);
+            }
             requestProperties = null;
             desiredDocuments = Array.Empty<Document>();
             status.Code = RequestStatus.StatusCode.InProgress;
@@ -360,7 +368,7 @@ namespace Lpp.Dns.DataMart.Model
 
         public void Start(string requestId, bool viewSQL = false)
         {
-
+            
             if (_request == null && !IsDistributedRegressionRequest)
                 throw new NullReferenceException("The deserialized request is null, please make sure that RequestDocument is called first and that the request document is not null.");
             

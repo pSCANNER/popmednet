@@ -44,6 +44,7 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
         public string JobStopFilename { get; private set; }
         public string OutputManifestFilename { get; private set; }
         public string RequestIdentifier { get; set; }
+        public string DataMartID { get; set; }
 
         public bool IsAnalysisCenter { get; private set; }
 
@@ -60,6 +61,7 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
             JobStopFilename = settings.GetAsString("ExecutionStopFilename", "job_done.ok");
             OutputManifestFilename = settings.GetAsString("ManifestFilename", "file_list.csv");
             RequestIdentifier = ReplaceInvalidFilePathCharacters(settings.GetAsString("MSRequestID", ""), string.Empty);
+            DataMartID = settings.GetAsString("DataMartID", "");
 
             if (string.IsNullOrEmpty(RootMonitorFolder))
             {
@@ -106,7 +108,7 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
         {
             string outputfilesFolderPath = Path.Combine(RootMonitorFolder, RequestIdentifier, "msoc");
             string inputfilesFolderPath = Path.Combine(RootMonitorFolder, RequestIdentifier, "inputfiles");
-
+            
             if (!Directory.Exists(inputfilesFolderPath))
             {
                 Directory.CreateDirectory(inputfilesFolderPath);
@@ -117,8 +119,64 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
                 Directory.CreateDirectory(outputfilesFolderPath);
             }
 
-            if (requestDocs.Any(d => string.Equals(Path.GetExtension(d.Document.Filename), ".zip", StringComparison.OrdinalIgnoreCase)))
+            //if (requestDocs.Any(d => string.Equals(Path.GetExtension(d.Document.Filename), ".zip", StringComparison.OrdinalIgnoreCase)))
+            //{
+            //    //initial iteration with the setup package, extract if the "inputfiles" folder is empty
+            //    //if(!Directory.EnumerateFileSystemEntries(inputfilesFolderPath).Any())
+            //    //{
+            //    //    var initialSetupPackage = requestDocs.First(d => string.Equals(Path.GetExtension(d.Document.Filename), ".zip", StringComparison.OrdinalIgnoreCase));
+
+            //    //    using (ZipArchive archive = new ZipArchive(initialSetupPackage.Stream))
+            //    //    {
+            //    //        archive.ExtractToDirectory(Path.Combine(RootMonitorFolder, RequestIdentifier));
+            //    //    }
+            //    //}
+            //}
+            if (requestDocs.Any(d => string.Equals(d.Document.Filename, "manifestDestination.json", StringComparison.OrdinalIgnoreCase)))
             {
+                List<DocumentWithStream> filteredDocs = new List<DocumentWithStream>();
+                bool filesCopied = false;
+                var manifestDocument = requestDocs.FirstOrDefault(
+                    d => string.Equals(
+                    d.Document.Filename,
+                    "manifestDestination.json",
+                    StringComparison.OrdinalIgnoreCase) &&
+                    d.Document.Kind == DTO.Enums.DocumentKind.SystemGeneratedNoLog);
+                if (manifestDocument != null)
+                {
+                    using (var sr = new StreamReader(manifestDocument.Stream))
+                    using (var jr = new Newtonsoft.Json.JsonTextReader(sr))
+                    {
+                        var serializer = new Newtonsoft.Json.JsonSerializer();
+                        var manifestItems = serializer.Deserialize<DTO.QueryComposer.DistributedRegressionAnalysisCenterResultManifestItem[]>(jr);
+
+                        if (manifestItems != null)
+                        {
+                            foreach (var item in manifestItems)
+                            {
+                                Guid destinationID = item.DataMartDestinationID;
+                                if (DataMartID == destinationID.ToString() || destinationID == Guid.Empty)
+                                {
+                                    var filteredDoc = requestDocs.First(x => x.Document.DocumentID == item.DocumentID.ToString());
+                                    using (FileStream destination = File.Create(Path.Combine(inputfilesFolderPath, filteredDoc.Document.Filename)))
+                                    {
+                                        filteredDoc.Stream.CopyTo(destination);
+                                        destination.Flush();
+                                        destination.Close();
+                                        filesCopied = true;
+                                    }
+                                }
+                            }
+                        }
+                        if (filesCopied)
+                        {
+                            using (var fs = File.CreateText(Path.Combine(outputfilesFolderPath, JobStopFilename)))
+                            {
+                                fs.Close();
+                            }
+                        }
+                    }
+                }
                 //initial iteration with the setup package, extract if the "inputfiles" folder is empty
                 //if(!Directory.EnumerateFileSystemEntries(inputfilesFolderPath).Any())
                 //{
@@ -253,10 +311,9 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
                 using (StreamWriter file = File.CreateText(Path.Combine(requestDirectory, "manifest.json")))
                 {
                     serializer.Serialize(file, manifestDocuments);
+                    file.Flush();
                 }
             }
-
-            //writes out the manifest json file.
 
             //save the files to the specified folders based on the manifest file
             foreach (var document in manifestDocuments)
