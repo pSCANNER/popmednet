@@ -8,6 +8,8 @@ using Lpp.Dns.DTO.QueryComposer;
 using log4net;
 using System.IO;
 using Lpp.Dns.DataMart.Model.Settings;
+using System.Runtime.Remoting.Lifetime;
+using System.Runtime.Remoting;
 
 namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
 {
@@ -53,7 +55,6 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
         public override void Initialize(IDictionary<string, object> settings)
         {
             base.Initialize(settings);
-
             RootMonitorFolder = settings.GetAsString("MonitorFolder", "");
             JobStartFilename = settings.GetAsString("SuccessfulInitializationFilename", "job_started.ok");
             ExecutionCompleteFilename = settings.GetAsString("ExecutionCompleteFilename", "files_done.ok");
@@ -108,7 +109,10 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
         {
             string outputfilesFolderPath = Path.Combine(RootMonitorFolder, RequestIdentifier, "msoc");
             string inputfilesFolderPath = Path.Combine(RootMonitorFolder, RequestIdentifier, "inputfiles");
-            
+
+            var taskDocs = new List<DocumentWithStream>();
+            var sponsor = new ClientSponsor(TimeSpan.FromHours(24));
+
             if (!Directory.Exists(inputfilesFolderPath))
             {
                 Directory.CreateDirectory(inputfilesFolderPath);
@@ -117,6 +121,14 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
             if (!Directory.Exists(outputfilesFolderPath))
             {
                 Directory.CreateDirectory(outputfilesFolderPath);
+            }
+
+            foreach (DocumentWithStream doc in requestDocs)
+            {
+                var doclease = doc.InitializeLifetimeService() as ILease;
+                var docStreamLease = doc.Stream.InitializeLifetimeService() as ILease;
+                doclease.Register(sponsor, TimeSpan.FromHours(24));
+                docStreamLease.Register(sponsor, TimeSpan.FromHours(24));
             }
 
             //if (requestDocs.Any(d => string.Equals(Path.GetExtension(d.Document.Filename), ".zip", StringComparison.OrdinalIgnoreCase)))
@@ -158,9 +170,9 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
                                 if (DataMartID == destinationID.ToString() || destinationID == Guid.Empty)
                                 {
                                     var filteredDoc = requestDocs.First(x => x.Document.DocumentID == item.DocumentID.ToString());
-                                    using (FileStream destination = File.Create(Path.Combine(inputfilesFolderPath, filteredDoc.Document.Filename)))
+                                    using (FileStream destination = File.Create(Path.Combine(inputfilesFolderPath, filteredDoc.Document.Filename), 104857600))
                                     {
-                                        filteredDoc.Stream.CopyTo(destination);
+                                        filteredDoc.Stream.CopyTo(destination, 104857600);
                                         destination.Flush();
                                         destination.Close();
                                         filesCopied = true;
@@ -192,9 +204,9 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
             {
                 foreach (var f in requestDocs)
                 {
-                    using(FileStream destination = File.Create(Path.Combine(inputfilesFolderPath, f.Document.Filename)))
+                    using(FileStream destination = File.Create(Path.Combine(inputfilesFolderPath, f.Document.Filename), 104857600))
                     {
-                        f.Stream.CopyTo(destination);
+                        f.Stream.CopyTo(destination, 104857600);
                         destination.Flush();
                         destination.Close();
                     }
@@ -280,6 +292,7 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
 
         IEnumerable<QueryComposerModelProcessor.DocumentEx> ProcessForAnalysisCenter(DocumentWithStream[] requestDocs)
         {
+            var outputDocuments = new List<QueryComposerModelProcessor.DocumentEx>();
             string outputFolderPath = Path.Combine(RootMonitorFolder, RequestIdentifier, "inputfiles");
             //if(Directory.Exists(outputFolderPath) == false)
             //{
@@ -293,7 +306,7 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
 
             //look for the manifest.json file
             var manifestDocument = requestDocs.FirstOrDefault(d => string.Equals(d.Document.Filename, "manifest.json", StringComparison.OrdinalIgnoreCase) && d.Document.Kind == Lpp.Dns.DTO.Enums.DocumentKind.SystemGeneratedNoLog);
-            if(manifestDocument == null)
+            if (manifestDocument == null)
             {
                 throw new Exception("Missing Analysis Center manifest file, unable to determine location to extract input files.");
             }
@@ -303,8 +316,8 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
             Dictionary<Guid, string> datapartnerFolders = new Dictionary<Guid, string>();
             string requestDirectory = Path.Combine(RootMonitorFolder, RequestIdentifier);
 
-            using(var sr = new StreamReader(manifestDocument.Stream))
-            using(var jr = new Newtonsoft.Json.JsonTextReader(sr))
+            using (var sr = new StreamReader(manifestDocument.Stream))
+            using (var jr = new Newtonsoft.Json.JsonTextReader(sr))
             {
                 var serializer = new Newtonsoft.Json.JsonSerializer();
                 manifestDocuments = serializer.Deserialize<DistributedRegressionAnalysisCenterManifestItem[]>(jr);
@@ -314,50 +327,92 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
                     file.Flush();
                 }
             }
-
-            //save the files to the specified folders based on the manifest file
-            foreach (var document in manifestDocuments)
+            //var taskDocs = new List<DocumentWithStream>();
+            var sponsor = new ClientSponsor(TimeSpan.FromHours(24));
+            foreach(DocumentWithStream doc in requestDocs)
             {
-                if (string.IsNullOrEmpty(document.DataPartnerIdentifier))
-                {
-                    //TODO:cannot extract file without knowing the folder, find out if this should fail everything
-
-                    continue;
-                }
-
-                var doc = requestDocs.FirstOrDefault(d => d.ID == document.DocumentID);
-                if(doc == null)
-                {
-                    continue;
-                }
-
-                string partnerDirectory = Path.Combine(RootMonitorFolder, RequestIdentifier, document.DataPartnerIdentifier);
-                if (!Directory.Exists(partnerDirectory))
-                {
-                    Directory.CreateDirectory(partnerDirectory);
-                }
-
-                using(var writer = File.OpenWrite(Path.Combine(partnerDirectory, doc.Document.Filename)))
-                {
-                    doc.Stream.CopyTo(writer);
-                    writer.Flush();
-                }
-
-                if(datapartnerFolders.ContainsKey(document.DataMartID) == false)
-                {
-                    datapartnerFolders.Add(document.DataMartID, partnerDirectory);
-                }
-
+                var doclease = doc.InitializeLifetimeService() as ILease;
+                var docStreamLease = doc.Stream.InitializeLifetimeService() as ILease;
+                doclease.Register(sponsor, TimeSpan.FromHours(24));
+                docStreamLease.Register(sponsor, TimeSpan.FromHours(24));
+                //taskDocs.Add(new DocumentWithStream(new Guid(doc.Document.DocumentID), doc.Document, doc.Stream));
             }
 
+            var restart = false;
+            var tryCount = 0;
+            do
+            {
+                try {
+                    //save the files to the specified folders based on the manifest file
+
+                    foreach (var document in manifestDocuments)
+                    {
+                        if (string.IsNullOrEmpty(document.DataPartnerIdentifier))
+                        {
+                            //TODO:cannot extract file without knowing the folder, find out if this should fail everything
+
+                            continue;
+                        }
+
+                        //var doc = requestDocs.FirstOrDefault(d => d.ID == document.DocumentID);
+                        var doc = requestDocs.FirstOrDefault(d => d.ID == document.DocumentID);
+                        if (doc == null)
+                        {
+                            continue;
+                        }
+
+                        var partnerDirectory = Path.Combine(RootMonitorFolder, RequestIdentifier, document.DataPartnerIdentifier);
+
+                        if (!Directory.Exists(partnerDirectory))
+                        {
+                            Directory.CreateDirectory(partnerDirectory);
+                        }
+                        var fileInfo = new FileInfo(Path.Combine(partnerDirectory, doc.Document.Filename));
+                        if (!fileInfo.Exists || (fileInfo.Length != doc.Document.Size))
+                        {
+                            //System.Threading.Thread.Sleep(TimeSpan.FromSeconds(1));
+                            using (var writer = File.Create(Path.Combine(partnerDirectory, doc.Document.Filename), doc.Document.Size))
+                            {
+                                doc.Stream.CopyTo(writer, 104857600);
+                                doc.Stream.Close();
+                                writer.Flush();
+                                doc.Stream.Dispose();
+                                doc.Dispose();
+                            }
+                            GC.Collect();
+                            GC.WaitForPendingFinalizers();
+                        }
+                        if (!datapartnerFolders.ContainsKey(document.DataMartID))
+                        {
+                            datapartnerFolders.Add(document.DataMartID, partnerDirectory);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //System.Threading.Thread.Sleep(TimeSpan.FromMilliseconds(5));
+                    if (tryCount < 10)
+                    {
+                        restart = true;
+                    }
+                    else
+                    {
+                        restart = false;
+                        throw;
+                    }
+                    tryCount++;
+                }
+            }
+            while (restart);
+
             //write the trigger files for each datapartner input folder
-            foreach(var dpf in datapartnerFolders)
+            foreach (var dpf in datapartnerFolders)
             {
                 using (var fs = File.CreateText(Path.Combine(dpf.Value, ExecutionCompleteFilename)))
                 {
                     fs.Close();
                 }
-            }            
+            }
 
             if (!TriggerFileExists(outputFolderPath, TriggerFileNames))
             {
@@ -383,12 +438,12 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
                         throw new Exception("The maximum time to wait for results has been exceeded. Please confirm the SAS application has been started.");
                     }
 
-                    System.Threading.Thread.Sleep(TimeSpan.FromSeconds(1));
+                    System.Threading.Thread.Sleep(TimeSpan.FromMilliseconds(5));
                 }
             }
 
             //get all the files to upload that are listed in the filelist document
-            List<QueryComposerModelProcessor.DocumentEx> outputDocuments = FilesToUpload(outputFolderPath);
+            outputDocuments = FilesToUpload(outputFolderPath);
 
             //get the actual file bytes for the trigger files
             foreach (var document in outputDocuments)
@@ -415,7 +470,6 @@ namespace Lpp.Dns.DataMart.Model.QueryComposer.Adapters.DistributedRegression
             }
 
             DeleteTriggerFiles(outputFolderPath);
-
             return outputDocuments;
         }
 
